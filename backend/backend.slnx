@@ -1,2 +1,14 @@
 <Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BetterTracker.Api/BetterTracker.Api.csproj" />
+    <Project Path="src/BetterTracker.Common/BetterTracker.Common.csproj" />
+    <Project Path="src/BetterTracker.Contracts/BetterTracker.Contracts.csproj" />
+    <Project Path="src/BetterTracker.Core/BetterTracker.Core.csproj" />
+    <Project Path="src/BetterTracker.Data.Migrations/BetterTracker.Data.Migrations.csproj" />
+    <Project Path="src/BetterTracker.Data/BetterTracker.Data.csproj" />
+    <Project Path="src/BetterTracker/BetterTracker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BetterTracker.Tests/BetterTracker.Tests.csproj" />
+  </Folder>
 </Solution>
