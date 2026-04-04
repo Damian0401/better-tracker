@@ -13,6 +13,16 @@ public static class Setup
 {
     public static IHostApplicationBuilder AddApi(this IHostApplicationBuilder builder)
     {
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader();
+            });
+        });
+
         builder.Services
             .AddApiVersioning(options =>
             {
@@ -38,6 +48,7 @@ public static class Setup
 
     public static WebApplication UseApi(this WebApplication app)
     {
+        app.UseCors();
         app.MapOpenApi();
         app.MapScalarApiReference();
         return app;
