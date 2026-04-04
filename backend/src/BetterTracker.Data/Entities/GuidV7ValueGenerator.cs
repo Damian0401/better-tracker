@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
 
-namespace BetterTracker.Data;
+namespace BetterTracker.Data.Entities;
 
 internal sealed class GuidV7ValueGenerator : ValueGenerator<Guid>
 {

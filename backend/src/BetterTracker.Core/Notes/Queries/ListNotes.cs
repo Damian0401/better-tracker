@@ -1,5 +1,6 @@
 using BetterTracker.Contracts;
 using BetterTracker.Data;
+using BetterTracker.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BetterTracker.Core.Notes.Queries;

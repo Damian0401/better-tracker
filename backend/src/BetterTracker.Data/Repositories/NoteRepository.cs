@@ -1,6 +1,7 @@
+using BetterTracker.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace BetterTracker.Data;
+namespace BetterTracker.Data.Repositories;
 
 public sealed class NoteRepository : INoteRepository
 {

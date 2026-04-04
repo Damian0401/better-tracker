@@ -1,4 +1,4 @@
-namespace BetterTracker.Data;
+namespace BetterTracker.Data.Entities;
 
 public interface ITimeTrackable
 {

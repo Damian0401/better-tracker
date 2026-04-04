@@ -1,6 +1,7 @@
 using BetterTracker.Contracts;
 using BetterTracker.Core.Notes.Commands;
-using BetterTracker.Data;
+using BetterTracker.Data.Entities;
+using BetterTracker.Data.Repositories;
 using FluentAssertions;
 using NSubstitute;
 

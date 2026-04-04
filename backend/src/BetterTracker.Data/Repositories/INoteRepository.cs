@@ -1,4 +1,6 @@
-namespace BetterTracker.Data;
+using BetterTracker.Data.Entities;
+
+namespace BetterTracker.Data.Repositories;
 
 public interface INoteRepository
 {

@@ -2,7 +2,7 @@ using BetterTracker.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace BetterTracker.Data;
+namespace BetterTracker.Data.Entities;
 
 public sealed record NoteEntity : BaseEntity<Guid>
 {

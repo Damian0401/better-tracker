@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using BetterTracker.Contracts;
 using BetterTracker.Core.Notes.Commands;
-using BetterTracker.Data;
+using BetterTracker.Data.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;

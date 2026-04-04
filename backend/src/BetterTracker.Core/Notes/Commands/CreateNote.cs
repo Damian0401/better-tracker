@@ -1,5 +1,6 @@
 using BetterTracker.Contracts;
-using BetterTracker.Data;
+using BetterTracker.Data.Entities;
+using BetterTracker.Data.Repositories;
 
 namespace BetterTracker.Core.Notes.Commands;
 
