@@ -19,7 +19,7 @@ public class UpdateNoteEndpoint : IApiEndpoint
     public IEndpointConventionBuilder Register(IEndpointRouteBuilder builder) =>
         builder.MapPut("/notes/{id:guid}", HandleAsync).WithValidation<Parameters>();
 
-    private static async ValueTask<NoContent> HandleAsync(
+    private static async ValueTask<Results<NoContent, NotFound>> HandleAsync(
         [AsParameters] Parameters parameters,
         [AsParameters] Services services)
     {
@@ -30,10 +30,15 @@ public class UpdateNoteEndpoint : IApiEndpoint
             Content = parameters.Request.Content,
         };
 
-        await UpdateNote.HandleAsync(
+        var noteFound = await UpdateNote.HandleAsync(
             request,
             services.NoteRepository,
             services.CancellationToken);
+
+        if (!noteFound)
+        {
+            return TypedResults.NotFound();
+        }
 
         return TypedResults.NoContent();
     }

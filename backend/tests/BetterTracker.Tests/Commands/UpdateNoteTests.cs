@@ -37,12 +37,37 @@ public class UpdateNoteTests
             .Do(x => captured = x.Arg<NoteEntity>());
 
         // Act
-        await UpdateNote.HandleAsync(request, this._noteRepository, CancellationToken.None);
+        var result = await UpdateNote.HandleAsync(request, this._noteRepository, CancellationToken.None);
 
         // Assert
+        result.Should().BeTrue();
         captured.Should().NotBeNull();
         captured!.Title.Should().Be("New Title");
         captured.Content.Should().Be("New Content");
         await this._noteRepository.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_ShouldReturnFalse_WhenNoteDoesNotExist()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        this._noteRepository.GetByIdAsync(id, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<NoteEntity?>(null));
+
+        var request = new UpdateNoteRequest
+        {
+            Id = id,
+            Title = "New Title",
+            Content = "New Content",
+        };
+
+        // Act
+        var result = await UpdateNote.HandleAsync(request, this._noteRepository, CancellationToken.None);
+
+        // Assert
+        result.Should().BeFalse();
+        this._noteRepository.DidNotReceive().Update(Arg.Any<NoteEntity>());
+        await this._noteRepository.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 }

@@ -5,7 +5,7 @@ namespace BetterTracker.Core.Notes.Commands;
 
 public static class UpdateNote
 {
-    public static async Task HandleAsync(
+    public static async Task<bool> HandleAsync(
         UpdateNoteRequest request,
         INoteRepository noteRepository,
         CancellationToken cancellationToken)
@@ -13,7 +13,7 @@ public static class UpdateNote
         var note = await noteRepository.GetByIdAsync(request.Id, cancellationToken);
         if (note is null)
         {
-            return;
+            return false;
         }
 
         note.Title = request.Title;
@@ -21,5 +21,6 @@ public static class UpdateNote
 
         noteRepository.Update(note);
         await noteRepository.SaveChangesAsync(cancellationToken);
+        return true;
     }
 }

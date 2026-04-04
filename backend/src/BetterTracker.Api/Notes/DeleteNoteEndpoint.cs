@@ -18,7 +18,7 @@ public class DeleteNoteEndpoint : IApiEndpoint
     public IEndpointConventionBuilder Register(IEndpointRouteBuilder builder) =>
         builder.MapDelete("/notes/{id:guid}", HandleAsync);
 
-    private static async ValueTask<NoContent> HandleAsync(
+    private static async ValueTask<Results<NoContent, NotFound>> HandleAsync(
         [AsParameters] Parameters parameters,
         [AsParameters] Services services)
     {
@@ -27,10 +27,15 @@ public class DeleteNoteEndpoint : IApiEndpoint
             Id = parameters.Id,
         };
 
-        await DeleteNote.HandleAsync(
+        var noteFound = await DeleteNote.HandleAsync(
             request,
             services.NoteRepository,
             services.CancellationToken);
+
+        if (!noteFound)
+        {
+            return TypedResults.NotFound();
+        }
 
         return TypedResults.NoContent();
     }

@@ -28,10 +28,30 @@ public class DeleteNoteTests
         var request = new DeleteNoteRequest { Id = id };
 
         // Act
-        await DeleteNote.HandleAsync(request, this._noteRepository, CancellationToken.None);
+        var result = await DeleteNote.HandleAsync(request, this._noteRepository, CancellationToken.None);
 
         // Assert
+        result.Should().BeTrue();
         this._noteRepository.Received(1).Remove(Arg.Is(note));
         await this._noteRepository.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_ShouldReturnFalse_WhenNoteDoesNotExist()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        this._noteRepository.GetByIdAsync(id, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<NoteEntity?>(null));
+
+        var request = new DeleteNoteRequest { Id = id };
+
+        // Act
+        var result = await DeleteNote.HandleAsync(request, this._noteRepository, CancellationToken.None);
+
+        // Assert
+        result.Should().BeFalse();
+        this._noteRepository.DidNotReceive().Remove(Arg.Any<NoteEntity>());
+        await this._noteRepository.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 }

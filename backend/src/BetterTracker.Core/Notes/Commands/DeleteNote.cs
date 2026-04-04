@@ -5,7 +5,7 @@ namespace BetterTracker.Core.Notes.Commands;
 
 public static class DeleteNote
 {
-    public static async Task HandleAsync(
+    public static async Task<bool> HandleAsync(
         DeleteNoteRequest request,
         INoteRepository noteRepository,
         CancellationToken cancellationToken)
@@ -13,10 +13,11 @@ public static class DeleteNote
         var note = await noteRepository.GetByIdAsync(request.Id, cancellationToken);
         if (note is null)
         {
-            return;
+            return false;
         }
 
         noteRepository.Remove(note);
         await noteRepository.SaveChangesAsync(cancellationToken);
+        return true;
     }
 }
