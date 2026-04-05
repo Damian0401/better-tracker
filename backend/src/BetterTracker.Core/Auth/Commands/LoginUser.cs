@@ -1,3 +1,4 @@
+using BetterTracker.Common.Results;
 using BetterTracker.Contracts;
 using BetterTracker.Data.Entities;
 using BetterTracker.Data.Repositories;
@@ -6,7 +7,7 @@ namespace BetterTracker.Core.Auth.Commands;
 
 public static class LoginUser
 {
-    public static async Task<UserEntity> HandleAsync(
+    public static async Task<Result<UserEntity>> HandleAsync(
         LoginRequest request,
         IUserRepository userRepository,
         CancellationToken cancellationToken)
@@ -14,15 +15,15 @@ public static class LoginUser
         var user = await userRepository.GetByLoginAsync(request.Login, cancellationToken);
         if (user is null)
         {
-            throw new UnauthorizedAccessException("Invalid login or password");
+            return Result<UserEntity>.Failure("Invalid login or password");
         }
 
         var isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
         if (!isPasswordValid)
         {
-            throw new UnauthorizedAccessException("Invalid login or password");
+            return Result<UserEntity>.Failure("Invalid login or password");
         }
 
-        return user;
+        return Result<UserEntity>.Success(user);
     }
 }

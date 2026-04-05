@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Asp.Versioning;
+using BetterTracker.Common.Helpers;
 using BetterTracker.Contracts;
 using BetterTracker.Core.Notes.Queries;
 using BetterTracker.Data;
@@ -19,19 +20,19 @@ public class ListNotesEndpoint : IApiEndpoint
     public IEndpointConventionBuilder Register(IEndpointRouteBuilder builder) =>
         builder.MapGet("/notes", HandleAsync).RequireAuthorization();
 
-    private static async ValueTask<Ok<ListNotesResponse>> HandleAsync(
+    private static async ValueTask<Results<Ok<ListNotesResponse>, UnauthorizedHttpResult>> HandleAsync(
         [AsParameters] Parameters parameters,
         [AsParameters] Services services)
     {
-        var userIdClaim = services.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (userIdClaim is null || !Guid.TryParse(userIdClaim, out var userId))
+        var userIdResult = UserIdHelper.GetUserId(services.HttpContextAccessor.HttpContext!);
+        if (!userIdResult.IsSuccess)
         {
-            throw new UnauthorizedAccessException("User is not authenticated");
+            return TypedResults.Unauthorized();
         }
 
         var response = await ListNotes.HandleAsync(
             parameters.Count,
-            userId,
+            userIdResult.Data,
             services.DbContext,
             services.CancellationToken);
 
@@ -50,7 +51,7 @@ public class ListNotesEndpoint : IApiEndpoint
         public required AppDbContext DbContext { get; init; }
 
         [FromServices]
-        public required HttpContext HttpContext { get; init; }
+        public required IHttpContextAccessor HttpContextAccessor { get; init; }
 
         public required CancellationToken CancellationToken { get; init; }
     }

@@ -1,3 +1,4 @@
+using BetterTracker.Common.Results;
 using BetterTracker.Contracts;
 using BetterTracker.Data.Entities;
 using BetterTracker.Data.Repositories;
@@ -6,7 +7,7 @@ namespace BetterTracker.Core.Auth.Commands;
 
 public static class RegisterUser
 {
-    public static async Task<UserEntity> HandleAsync(
+    public static async Task<Result<UserEntity>> HandleAsync(
         RegisterRequest request,
         IUserRepository userRepository,
         CancellationToken cancellationToken)
@@ -14,7 +15,7 @@ public static class RegisterUser
         var existingUser = await userRepository.GetByLoginAsync(request.Login, cancellationToken);
         if (existingUser is not null)
         {
-            throw new InvalidOperationException("User with this login already exists");
+            return Result<UserEntity>.Failure("User with this login already exists");
         }
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
@@ -29,6 +30,6 @@ public static class RegisterUser
         userRepository.Add(user);
         await userRepository.SaveChangesAsync(cancellationToken);
 
-        return user;
+        return Result<UserEntity>.Success(user);
     }
 }

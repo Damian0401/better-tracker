@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Asp.Versioning;
+using BetterTracker.Common.Helpers;
 using BetterTracker.Contracts;
 using BetterTracker.Core.Notes.Commands;
 using BetterTracker.Data.Repositories;
@@ -20,19 +21,19 @@ public class CreateNoteEndpoint : IApiEndpoint
     public IEndpointConventionBuilder Register(IEndpointRouteBuilder builder) =>
         builder.MapPost("/notes", HandleAsync).WithValidation<Parameters>().RequireAuthorization();
 
-    private static async ValueTask<NoContent> HandleAsync(
+    private static async ValueTask<Results<NoContent, UnauthorizedHttpResult>> HandleAsync(
         [AsParameters] Parameters parameters,
         [AsParameters] Services services)
     {
-        var userIdClaim = services.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (userIdClaim is null || !Guid.TryParse(userIdClaim, out var userId))
+        var userIdResult = UserIdHelper.GetUserId(services.HttpContextAccessor.HttpContext!);
+        if (!userIdResult.IsSuccess)
         {
-            throw new UnauthorizedAccessException("User is not authenticated");
+            return TypedResults.Unauthorized();
         }
 
         await CreateNote.HandleAsync(
             parameters.Request,
-            userId,
+            userIdResult.Data,
             services.NoteRepository,
             services.CancellationToken);
 
@@ -65,7 +66,7 @@ public class CreateNoteEndpoint : IApiEndpoint
         public required INoteRepository NoteRepository { get; init; }
 
         [FromServices]
-        public required HttpContext HttpContext { get; init; }
+        public required IHttpContextAccessor HttpContextAccessor { get; init; }
 
         public required CancellationToken CancellationToken { get; init; }
     }

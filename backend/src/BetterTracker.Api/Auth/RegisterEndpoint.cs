@@ -20,22 +20,27 @@ public class RegisterEndpoint : IApiEndpoint
     public IEndpointConventionBuilder Register(IEndpointRouteBuilder builder) =>
         builder.MapPost("/auth/register", HandleAsync).WithValidation<Parameters>();
 
-    private static async ValueTask<Ok<AuthResponse>> HandleAsync(
+    private static async ValueTask<Results<Ok<AuthResponse>, BadRequest<ErrorResponse>>> HandleAsync(
         [AsParameters] Parameters parameters,
         [AsParameters] Services services)
     {
-        var user = await RegisterUser.HandleAsync(
+        var result = await RegisterUser.HandleAsync(
             parameters.Request,
             services.UserRepository,
             services.CancellationToken);
 
-        var token = services.TokenService.GenerateToken(user.Id, user.UserName);
+        if (!result.IsSuccess)
+        {
+            return TypedResults.BadRequest(new ErrorResponse { Errors = result.ErrorMessages });
+        }
+
+        var token = services.TokenService.GenerateToken(result.Data!.Id, result.Data.UserName);
 
         var response = new AuthResponse
         {
             Token = token,
-            UserId = user.Id,
-            UserName = user.UserName
+            UserId = result.Data.Id,
+            UserName = result.Data.UserName
         };
 
         return TypedResults.Ok(response);

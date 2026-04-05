@@ -91,21 +91,27 @@ This codebase follows specific architectural patterns documented in `.opencode/r
    - Commands are `public static class` with `HandleAsync` method
    - Commands use entity-specific repositories (`IEntityRepository`)
    - Queries use `DbContext` directly for LINQ composition
-   - Return types: `Task`/`Task<T>` for commands, `ValueTask<TResponse>` for queries
+   - Return types: `Task<Result>`/`Task<Result<T>>` for commands, `ValueTask<Result<TResponse>>` for queries
 
-4. **[Repository Pattern](.opencode/rules/repository-pattern.md)**
+4. **[Result Pattern](.opencode/rules/result-pattern.md)**
+   - Use `Result` and `Result<T>` instead of throwing exceptions for normal flow
+   - `Result` has `IsSuccess` flag and `ErrorMessages` array
+   - `Result<T>` adds `Data` property for typed responses
+   - Reserve exceptions for truly exceptional situations only
+
+5. **[Repository Pattern](.opencode/rules/repository-pattern.md)**
    - Entity-specific repository interfaces (e.g., `IEntityRepository`)
    - Simple methods: `Add`, `Update`, `Remove`, `GetByIdAsync`, `SaveChangesAsync`
    - Used in commands for testability
    - NOT used in queries (use DbContext instead)
 
-5. **[Entity Configuration Pattern](.opencode/rules/entity-configuration-pattern.md)**
+6. **[Entity Configuration Pattern](.opencode/rules/entity-configuration-pattern.md)**
    - Entities extend `BaseEntity<TKey>` (sealed records)
    - Nested `internal class Configuration : BaseConfiguration<TEntity>`
    - GuidV7 value generator for time-ordered GUIDs
    - Automatic timestamp tracking via `ITimeTrackable`
 
-6. **[Testing Patterns](.opencode/rules/testing-patterns.md)**
+7. **[Testing Patterns](.opencode/rules/testing-patterns.md)**
    - xUnit with FluentAssertions and NSubstitute
    - Only commands are unit tested (mock repositories)
    - Queries are NOT unit tested (integration test in staging instead)
@@ -223,6 +229,7 @@ All detailed architectural patterns and conventions are documented in `.opencode
 - `clean-architecture-structure.md` - Solution structure and layer responsibilities
 - `endpoint-patterns.md` - How to create API endpoints
 - `command-query-pattern.md` - Command and query implementation patterns
+- `result-pattern.md` - Result types for error handling without exceptions
 - `repository-pattern.md` - Entity-specific repository pattern
 - `entity-configuration-pattern.md` - Entity and EF Core configuration
 - `testing-patterns.md` - xUnit testing with mocks
