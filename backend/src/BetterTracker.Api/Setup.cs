@@ -1,10 +1,17 @@
+using System.Text;
 using Asp.Versioning;
 using Asp.Versioning.Builder;
+using BetterTracker.Common;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.OpenApi;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 
 namespace BetterTracker.Api;
@@ -13,6 +20,10 @@ public static class Setup
 {
     public static IHostApplicationBuilder AddApi(this IHostApplicationBuilder builder)
     {
+        builder.Services.AddHttpContextAccessor();
+
+        builder.Services.AddProblemDetails();
+
         builder.Services.AddCors(options =>
         {
             options.AddDefaultPolicy(policy =>
@@ -22,6 +33,31 @@ public static class Setup
                       .AllowAnyHeader();
             });
         });
+
+        // Add JWT Authentication
+        var authOptions = builder.Configuration.GetSection(AuthOptions.SectionName).Get<AuthOptions>();
+        if (authOptions is not null)
+        {
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authOptions.Secret)),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+
+            builder.Services.AddAuthorization();
+        }
 
         builder.Services
             .AddApiVersioning(options =>
@@ -48,7 +84,12 @@ public static class Setup
 
     public static WebApplication UseApi(this WebApplication app)
     {
+        app.UseExceptionHandler();
+        app.UseStatusCodePages();
+        
         app.UseCors();
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.MapOpenApi();
         app.MapScalarApiReference();
         return app;

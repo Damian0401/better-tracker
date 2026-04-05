@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Asp.Versioning;
 using BetterTracker.Contracts;
 using BetterTracker.Core.Notes.Commands;
@@ -16,12 +17,18 @@ public class DeleteNoteEndpoint : IApiEndpoint
     public string DefaultTag => ApiTags.Notes;
 
     public IEndpointConventionBuilder Register(IEndpointRouteBuilder builder) =>
-        builder.MapDelete("/notes/{id:guid}", HandleAsync);
+        builder.MapDelete("/notes/{id:guid}", HandleAsync).RequireAuthorization();
 
     private static async ValueTask<Results<NoContent, NotFound>> HandleAsync(
         [AsParameters] Parameters parameters,
         [AsParameters] Services services)
     {
+        var userIdClaim = services.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userIdClaim is null || !Guid.TryParse(userIdClaim, out var userId))
+        {
+            throw new UnauthorizedAccessException("User is not authenticated");
+        }
+
         var request = new DeleteNoteRequest
         {
             Id = parameters.Id,
@@ -29,6 +36,7 @@ public class DeleteNoteEndpoint : IApiEndpoint
 
         var noteFound = await DeleteNote.HandleAsync(
             request,
+            userId,
             services.NoteRepository,
             services.CancellationToken);
 
@@ -50,6 +58,9 @@ public class DeleteNoteEndpoint : IApiEndpoint
     {
         [FromServices]
         public required INoteRepository NoteRepository { get; init; }
+
+        [FromServices]
+        public required HttpContext HttpContext { get; init; }
 
         public required CancellationToken CancellationToken { get; init; }
     }

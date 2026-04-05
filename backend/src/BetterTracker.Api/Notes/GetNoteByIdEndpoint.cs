@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Asp.Versioning;
 using BetterTracker.Contracts;
 using BetterTracker.Core.Notes.Queries;
@@ -16,14 +17,21 @@ public class GetNoteByIdEndpoint : IApiEndpoint
     public string DefaultTag => ApiTags.Notes;
 
     public IEndpointConventionBuilder Register(IEndpointRouteBuilder builder) =>
-        builder.MapGet("/notes/{id:guid}", HandleAsync);
+        builder.MapGet("/notes/{id:guid}", HandleAsync).RequireAuthorization();
 
     private static async ValueTask<Results<Ok<GetNoteByIdResponse>, NotFound>> HandleAsync(
         [AsParameters] Parameters parameters,
         [AsParameters] Services services)
     {
+        var userIdClaim = services.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userIdClaim is null || !Guid.TryParse(userIdClaim, out var userId))
+        {
+            throw new UnauthorizedAccessException("User is not authenticated");
+        }
+
         var response = await GetNoteById.HandleAsync(
             parameters.Id,
+            userId,
             services.DbContext,
             services.CancellationToken);
 
@@ -45,6 +53,9 @@ public class GetNoteByIdEndpoint : IApiEndpoint
     {
         [FromServices]
         public required AppDbContext DbContext { get; init; }
+
+        [FromServices]
+        public required HttpContext HttpContext { get; init; }
 
         public required CancellationToken CancellationToken { get; init; }
     }

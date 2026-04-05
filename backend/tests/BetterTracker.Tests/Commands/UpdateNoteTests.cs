@@ -21,7 +21,8 @@ public class UpdateNoteTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var existingNote = new NoteEntity { Id = id, Title = "Old Title", Content = "Old Content" };
+        var userId = Guid.NewGuid();
+        var existingNote = new NoteEntity { Id = id, Title = "Old Title", Content = "Old Content", UserId = userId };
         this._noteRepository.GetByIdAsync(id, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<NoteEntity?>(existingNote));
 
@@ -37,7 +38,7 @@ public class UpdateNoteTests
             .Do(x => captured = x.Arg<NoteEntity>());
 
         // Act
-        var result = await UpdateNote.HandleAsync(request, this._noteRepository, CancellationToken.None);
+        var result = await UpdateNote.HandleAsync(request, userId, this._noteRepository, CancellationToken.None);
 
         // Assert
         result.Should().BeTrue();
@@ -52,6 +53,7 @@ public class UpdateNoteTests
     {
         // Arrange
         var id = Guid.NewGuid();
+        var userId = Guid.NewGuid();
         this._noteRepository.GetByIdAsync(id, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<NoteEntity?>(null));
 
@@ -63,7 +65,7 @@ public class UpdateNoteTests
         };
 
         // Act
-        var result = await UpdateNote.HandleAsync(request, this._noteRepository, CancellationToken.None);
+        var result = await UpdateNote.HandleAsync(request, userId, this._noteRepository, CancellationToken.None);
 
         // Assert
         result.Should().BeFalse();

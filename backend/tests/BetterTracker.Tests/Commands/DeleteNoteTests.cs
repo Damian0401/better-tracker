@@ -21,14 +21,15 @@ public class DeleteNoteTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var note = new NoteEntity { Id = id, Title = "Test Title", Content = "Test Content" };
+        var userId = Guid.NewGuid();
+        var note = new NoteEntity { Id = id, Title = "Test Title", Content = "Test Content", UserId = userId };
         this._noteRepository.GetByIdAsync(id, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<NoteEntity?>(note));
 
         var request = new DeleteNoteRequest { Id = id };
 
         // Act
-        var result = await DeleteNote.HandleAsync(request, this._noteRepository, CancellationToken.None);
+        var result = await DeleteNote.HandleAsync(request, userId, this._noteRepository, CancellationToken.None);
 
         // Assert
         result.Should().BeTrue();
@@ -41,13 +42,14 @@ public class DeleteNoteTests
     {
         // Arrange
         var id = Guid.NewGuid();
+        var userId = Guid.NewGuid();
         this._noteRepository.GetByIdAsync(id, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<NoteEntity?>(null));
 
         var request = new DeleteNoteRequest { Id = id };
 
         // Act
-        var result = await DeleteNote.HandleAsync(request, this._noteRepository, CancellationToken.None);
+        var result = await DeleteNote.HandleAsync(request, userId, this._noteRepository, CancellationToken.None);
 
         // Assert
         result.Should().BeFalse();

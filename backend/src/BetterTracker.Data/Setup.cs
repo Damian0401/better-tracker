@@ -10,8 +10,7 @@ public static class Setup
 {
     public static IHostApplicationBuilder AddDatabase(this IHostApplicationBuilder builder)
     {
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-            ?? "Data Source=bettertracker.db";
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite(connectionString, 
@@ -23,6 +22,7 @@ public static class Setup
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<INoteRepository, NoteRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
         return services;
     }
 }

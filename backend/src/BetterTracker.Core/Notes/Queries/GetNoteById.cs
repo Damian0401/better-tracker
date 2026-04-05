@@ -9,11 +9,12 @@ public static class GetNoteById
 {
     public static async ValueTask<GetNoteByIdResponse?> HandleAsync(
         Guid id,
+        Guid userId,
         AppDbContext dbContext,
         CancellationToken cancellationToken)
     {
         var note = await dbContext.Notes
-            .Where(x => x.Id == id)
+            .Where(x => x.Id == id && x.UserId == userId)
             .Select(x => new GetNoteByIdResponse.Dto
             {
                 Id = x.Id,

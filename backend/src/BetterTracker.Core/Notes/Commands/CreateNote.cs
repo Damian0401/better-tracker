@@ -8,6 +8,7 @@ public static class CreateNote
 {
     public static async Task HandleAsync(
         CreateNoteRequest request,
+        Guid userId,
         INoteRepository noteRepository,
         CancellationToken cancellationToken)
     {
@@ -15,6 +16,7 @@ public static class CreateNote
         {
             Title = request.Title,
             Content = request.Content,
+            UserId = userId,
         };
 
         noteRepository.Add(note);

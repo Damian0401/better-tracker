@@ -11,12 +11,14 @@ public static class ListNotes
 
     public static async ValueTask<ListNotesResponse> HandleAsync(
         int? count,
+        Guid userId,
         AppDbContext dbContext,
         CancellationToken cancellationToken)
     {
         var take = count ?? DefaultCount;
 
         var items = await dbContext.Notes
+            .Where(x => x.UserId == userId)
             .OrderByDescending(x => x.CreatedAt)
             .Take(take)
             .Select(x => new ListNotesResponse.Dto

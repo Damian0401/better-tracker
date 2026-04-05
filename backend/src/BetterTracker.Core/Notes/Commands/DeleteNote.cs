@@ -7,11 +7,12 @@ public static class DeleteNote
 {
     public static async Task<bool> HandleAsync(
         DeleteNoteRequest request,
+        Guid userId,
         INoteRepository noteRepository,
         CancellationToken cancellationToken)
     {
         var note = await noteRepository.GetByIdAsync(request.Id, cancellationToken);
-        if (note is null)
+        if (note is null || note.UserId != userId)
         {
             return false;
         }

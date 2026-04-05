@@ -19,6 +19,7 @@ public sealed class AppDbContext : DbContext
     }
 
     public DbSet<NoteEntity> Notes => this.Set<NoteEntity>();
+    public DbSet<UserEntity> Users => this.Set<UserEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
