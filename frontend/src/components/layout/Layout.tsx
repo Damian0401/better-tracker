@@ -1,18 +1,29 @@
-import { Link, useRouterState } from "@tanstack/react-router"
-import { cn } from "@/libs/utils/cn"
+import { Link, useRouter, useRouterState } from "@tanstack/react-router";
+import { cn } from "@/libs/utils/cn";
+import { Auth } from "@/libs/auth";
+import { Button } from "@/components/ui/button";
+import { Routes } from "@/constants";
 
 interface LayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export function Layout({ children }: LayoutProps) {
-  const routerState = useRouterState()
-  const currentPath = routerState.location.pathname
+  const router = useRouter();
+  const routerState = useRouterState();
+  const currentPath = routerState.location.pathname;
+  const isAuthenticated = Auth.isAuthenticated();
+  const user = Auth.getUser();
 
   const navItems = [
-    { path: "/", label: "Home" },
-    { path: "/notes", label: "Notes" },
-  ]
+    { path: Routes.HOME, label: "Home" },
+    { path: Routes.NOTES, label: "Notes" },
+  ];
+
+  const handleLogout = () => {
+    Auth.removeToken();
+    router.navigate({ to: Routes.LOGIN });
+  };
 
   return (
     <div className="flex h-screen">
@@ -43,8 +54,18 @@ export function Layout({ children }: LayoutProps) {
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
+        <div className="flex items-center justify-end gap-4 p-4">
+          {isAuthenticated && user && (
+            <span className="text-sm text-muted-foreground">{user.userName}</span>
+          )}
+          {isAuthenticated && (
+            <Button variant="outline" onClick={handleLogout}>
+              Logout
+            </Button>
+          )}
+        </div>
         {children}
       </main>
     </div>
-  )
+  );
 }

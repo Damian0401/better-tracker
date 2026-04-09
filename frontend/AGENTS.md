@@ -215,5 +215,6 @@ For more details, see the `.opencode/rules/` directory:
 - `api-client.md` — API client usage and error handling
 - `openapi-gen.md` — OpenAPI type generation workflow
 - `shadcn-setup.md` — shadcn/ui setup and component management
+- `constants.md` — Predefined constants for routes and storage keys
 
 **Always consult these files before implementing new features or making architectural decisions.**
