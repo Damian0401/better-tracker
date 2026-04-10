@@ -18,7 +18,7 @@ public class RegisterEndpoint : IApiEndpoint
     public string DefaultTag => ApiTags.Auth;
 
     public IEndpointConventionBuilder Register(IEndpointRouteBuilder builder) =>
-        builder.MapPost("/auth/register", HandleAsync).WithValidation<Parameters>();
+        builder.MapPost("/auth/register", HandleAsync).WithValidation<Parameters>().RequireRateLimiting("auth");
 
     private static async ValueTask<Results<Ok<AuthResponse>, BadRequest<ErrorResponse>>> HandleAsync(
         [AsParameters] Parameters parameters,
