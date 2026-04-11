@@ -53,8 +53,8 @@ export function Layout({ children }: LayoutProps) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
-        <div className="flex items-center justify-end gap-4 p-4">
+      <main className="flex flex-col flex-1 overflow-hidden">
+        <div className="flex shrink-0 items-center justify-end gap-4 p-4">
           {isAuthenticated && user && (
             <span className="text-sm text-muted-foreground">{user.userName}</span>
           )}
@@ -64,7 +64,9 @@ export function Layout({ children }: LayoutProps) {
             </Button>
           )}
         </div>
-        {children}
+        <div className="flex-1 overflow-hidden">
+          {children}
+        </div>
       </main>
     </div>
   );

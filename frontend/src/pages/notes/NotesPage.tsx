@@ -22,20 +22,37 @@ export function NotesPage() {
     content: "",
   })
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [isModified, setIsModified] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [skip, setSkip] = useState(0)
+  const [total, setTotal] = useState(0)
 
-  const fetchNotes = async () => {
-    const response = await Api.GET("/api/v1/notes")
+  const fetchNotes = async (skipParam: number = 0) => {
+    const response = await Api.GET("/api/v1/notes", {
+      params: { query: { Skip: skipParam, Count: 10 } },
+    })
     if (!response.data) {
       toast.error("Failed to fetch notes")
       return
     }
-    setNotes(response.data.items)
+    setTotal(response.data.total as number)
+    if (skipParam === 0) {
+      setNotes(response.data.items)
+    } else {
+      setNotes(prev => [...prev, ...response.data.items])
+    }
+    setSkip(skipParam + response.data.items.length)
+  }
+
+  const handleLoadMore = async () => {
+    setIsLoadingMore(true)
+    await fetchNotes(skip)
+    setIsLoadingMore(false)
   }
 
   useEffect(() => {
-    fetchNotes()
+    fetchNotes(0)
   }, [])
 
   const handleSelectNote = async (note: Note) => {
@@ -70,7 +87,15 @@ export function NotesPage() {
           return
         }
         toast.success("Note created successfully")
-        await fetchNotes()
+        const newNote: Note = {
+          id: crypto.randomUUID(),
+          title: formData.title,
+          content: formData.content,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }
+        setNotes(prev => [newNote, ...prev])
+        setTotal(prev => prev + 1)
         setIsCreating(false)
         setFormData({ title: "", content: "" })
         setIsModified(false)
@@ -84,11 +109,10 @@ export function NotesPage() {
           return
         }
         toast.success("Note updated successfully")
-        await fetchNotes()
-        const updatedNote = notes.find(n => n.id === selectedNote.id)
-        if (updatedNote) {
-          setSelectedNote({ ...updatedNote, ...formData })
-        }
+        setNotes(prev => prev.map(n => 
+          n.id === selectedNote.id ? { ...n, ...formData } : n
+        ))
+        setSelectedNote({ ...selectedNote, ...formData })
         setIsModified(false)
       }
     } finally {
@@ -113,7 +137,7 @@ export function NotesPage() {
         return
       }
       toast.success("Note deleted successfully")
-      await fetchNotes()
+      setNotes(prev => prev.filter(n => n.id !== selectedNote.id))
       setSelectedNote(null)
       setFormData({ title: "", content: "" })
       setIsModified(false)
@@ -152,13 +176,13 @@ export function NotesPage() {
   return (
     <div className="flex h-full">
       {/* Notes List */}
-      <div className="w-80 border-r">
+      <div className="flex w-80 flex-col border-r">
         <div className="border-b p-4">
           <Button onClick={handleCreate} className="w-full">
             Create Note
           </Button>
         </div>
-        <div className="overflow-auto">
+        <div className="min-h-0 flex-1 overflow-y-auto">
           {notes.map((note) => (
             <div
               key={note.id}
@@ -173,6 +197,18 @@ export function NotesPage() {
               </p>
             </div>
           ))}
+          {notes.length < total && (
+            <div className="p-4">
+              <Button
+                onClick={handleLoadMore}
+                variant="outline"
+                className="w-full"
+                disabled={isLoadingMore}
+              >
+                {isLoadingMore ? "Loading..." : "Load More"}
+              </Button>
+            </div>
+          )}
           {notes.length === 0 && (
             <div className="p-4 text-center text-muted-foreground">
               No notes yet. Create your first note!
