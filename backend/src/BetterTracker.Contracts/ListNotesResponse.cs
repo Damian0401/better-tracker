@@ -2,6 +2,7 @@ namespace BetterTracker.Contracts;
 
 public sealed record ListNotesResponse
 {
+    public required int Total { get; init; }
     public required IReadOnlyList<Dto> Items { get; init; }
 
     public sealed record Dto

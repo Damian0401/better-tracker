@@ -32,6 +32,7 @@ public class ListNotesEndpoint : IApiEndpoint
 
         var response = await ListNotes.HandleAsync(
             parameters.Count,
+            parameters.Skip,
             userIdResult.Data,
             services.DbContext,
             services.CancellationToken);
@@ -43,6 +44,9 @@ public class ListNotesEndpoint : IApiEndpoint
     {
         [FromQuery]
         public int? Count { get; init; }
+
+        [FromQuery]
+        public int? Skip { get; init; }
     }
 
     internal readonly struct Services

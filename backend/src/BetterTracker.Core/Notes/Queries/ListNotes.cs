@@ -11,15 +11,22 @@ public static class ListNotes
 
     public static async ValueTask<ListNotesResponse> HandleAsync(
         int? count,
+        int? skip,
         Guid userId,
         AppDbContext dbContext,
         CancellationToken cancellationToken)
     {
         var take = count ?? DefaultCount;
+        var skipCount = skip ?? 0;
+
+        var total = await dbContext.Notes
+            .Where(x => x.UserId == userId)
+            .CountAsync(cancellationToken);
 
         var items = await dbContext.Notes
             .Where(x => x.UserId == userId)
             .OrderByDescending(x => x.CreatedAt)
+            .Skip(skipCount)
             .Take(take)
             .Select(x => new ListNotesResponse.Dto
             {
@@ -31,6 +38,6 @@ public static class ListNotes
             })
             .ToListAsync(cancellationToken);
 
-        return new ListNotesResponse { Items = items };
+        return new ListNotesResponse { Total = total, Items = items };
     }
 }

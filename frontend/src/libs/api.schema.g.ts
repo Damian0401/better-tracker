@@ -15,6 +15,7 @@ export interface paths {
             parameters: {
                 query?: {
                     Count?: number | string;
+                    Skip?: number | string;
                 };
                 header?: never;
                 path?: never;
@@ -280,6 +281,8 @@ export interface components {
             note: components["schemas"]["Dto"];
         };
         ListNotesResponse: {
+            /** Format: int32 */
+            total: number | string;
             items: components["schemas"]["Dto"][];
         };
         LoginRequest: {
