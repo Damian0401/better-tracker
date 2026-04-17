@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate:api": "npx openapi-typescript@latest %VITE_API_URL%/openapi/v1.json -o ./src/libs/api.schema.g.ts",
+    "generate:api": "npx openapi-typescript@latest $VITE_API_URL/openapi/v1.json -o ./src/libs/api.schema.g.ts",
     "generate": "npx dotenv-cli -v NODE_TLS_REJECT_UNAUTHORIZED=0 -- npm run generate:api"
   },
   "dependencies": {

@@ -1,3 +1,4 @@
+using BetterTracker.Common.Results;
 using BetterTracker.Contracts;
 using BetterTracker.Data.Entities;
 using BetterTracker.Data.Repositories;
@@ -6,7 +7,7 @@ namespace BetterTracker.Core.Notes.Commands;
 
 public static class CreateNote
 {
-    public static async Task HandleAsync(
+    public static async Task<Result<CreateNoteResponse>> HandleAsync(
         CreateNoteRequest request,
         Guid userId,
         INoteRepository noteRepository,
@@ -21,5 +22,7 @@ public static class CreateNote
 
         noteRepository.Add(note);
         await noteRepository.SaveChangesAsync(cancellationToken);
+
+        return Result<CreateNoteResponse>.Success(new CreateNoteResponse { Id = note.Id });
     }
 }

@@ -48,12 +48,14 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description No Content */
-                204: {
+                /** @description Created */
+                201: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "application/json": components["schemas"]["CreateNoteResponse"];
+                    };
                 };
             };
         };
@@ -263,6 +265,10 @@ export interface components {
         CreateNoteRequest: {
             title: string;
             content: string;
+        };
+        CreateNoteResponse: {
+            /** Format: uuid */
+            id: string;
         };
         Dto: {
             /** Format: uuid */

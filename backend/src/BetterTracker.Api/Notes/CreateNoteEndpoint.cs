@@ -21,7 +21,7 @@ public class CreateNoteEndpoint : IApiEndpoint
     public IEndpointConventionBuilder Register(IEndpointRouteBuilder builder) =>
         builder.MapPost("/notes", HandleAsync).WithValidation<Parameters>().RequireAuthorization();
 
-    private static async ValueTask<Results<NoContent, UnauthorizedHttpResult>> HandleAsync(
+    private static async ValueTask<Results<Created<CreateNoteResponse>, UnauthorizedHttpResult>> HandleAsync(
         [AsParameters] Parameters parameters,
         [AsParameters] Services services)
     {
@@ -31,13 +31,15 @@ public class CreateNoteEndpoint : IApiEndpoint
             return TypedResults.Unauthorized();
         }
 
-        await CreateNote.HandleAsync(
+        var result = await CreateNote.HandleAsync(
             parameters.Request,
             userIdResult.Data,
             services.NoteRepository,
             services.CancellationToken);
 
-        return TypedResults.NoContent();
+        var locationUri = $"/notes/{result.Data!.Id}";
+
+        return TypedResults.Created(locationUri, result.Data);
     }
 
     internal class Validator : AbstractValidator<Parameters>

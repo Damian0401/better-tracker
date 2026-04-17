@@ -86,9 +86,13 @@ export function NotesPage() {
           toast.error("Failed to create note")
           return
         }
+        if (!response.data) {
+          toast.error("Failed to create note")
+          return
+        }
         toast.success("Note created successfully")
         const newNote: Note = {
-          id: crypto.randomUUID(),
+          id: response.data.id,
           title: formData.title,
           content: formData.content,
           createdAt: new Date().toISOString(),
