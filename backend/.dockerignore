@@ -1,0 +1,14 @@
+.git
+.gitignore
+.DS_Store
+.idea
+.opencode
+
+bin
+obj
+
+tests
+
+**/.vs
+**/.vscode
+**/.idea
