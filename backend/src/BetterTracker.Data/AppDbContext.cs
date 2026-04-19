@@ -20,6 +20,12 @@ public sealed class AppDbContext : DbContext
 
     public DbSet<NoteEntity> Notes => this.Set<NoteEntity>();
     public DbSet<UserEntity> Users => this.Set<UserEntity>();
+    public DbSet<JobApplicationEntity> JobApplications => this.Set<JobApplicationEntity>();
+    public DbSet<JobApplicationSalaryEntity> JobApplicationSalaries => this.Set<JobApplicationSalaryEntity>();
+    public DbSet<JobApplicationCommentEntity> JobApplicationComments => this.Set<JobApplicationCommentEntity>();
+    public DbSet<JobApplicationStatusHistoryEntity> JobApplicationStatusHistory => this.Set<JobApplicationStatusHistoryEntity>();
+    public DbSet<TagEntity> Tags => this.Set<TagEntity>();
+    public DbSet<JobApplicationTagEntity> JobApplicationTags => this.Set<JobApplicationTagEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

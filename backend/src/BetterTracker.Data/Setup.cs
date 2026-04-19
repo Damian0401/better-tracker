@@ -23,6 +23,8 @@ public static class Setup
     {
         services.AddScoped<INoteRepository, NoteRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
+        services.AddScoped<ITagRepository, TagRepository>();
         return services;
     }
 }
