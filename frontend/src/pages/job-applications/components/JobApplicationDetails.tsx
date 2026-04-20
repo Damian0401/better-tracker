@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { components } from "@/libs/api.schema.g";
+import { getTagColorClass } from "@/libs/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -53,12 +54,17 @@ export function JobApplicationDetails({
 }: JobApplicationDetailsProps) {
   const [tagInput, setTagInput] = useState("");
   const [newComment, setNewComment] = useState("");
+  const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
   const selectedTags = formData.tags ?? [];
+  const normalizedTagInput = tagInput.trim().toLowerCase();
 
-  useEffect(() => {
-    setTagInput("");
-    setNewComment("");
-  }, [selectedApplicationId, isCreating]);
+  const filteredAvailableTags = availableTags.filter((tag) => {
+    if (!normalizedTagInput) {
+      return true;
+    }
+
+    return tag.name.toLowerCase().includes(normalizedTagInput);
+  });
 
   const handleAddTag = () => {
     const wasAdded = onAddTag(tagInput);
@@ -200,11 +206,17 @@ export function JobApplicationDetails({
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Tags</label>
-              <div className="flex gap-2">
+              <div className="relative flex gap-2">
                 <Input
                   value={tagInput}
                   onChange={(event) => setTagInput(event.target.value)}
-                  placeholder="Add new tag"
+                  placeholder="Type to add or select tag"
+                  onFocus={() => setIsTagDropdownOpen(true)}
+                  onBlur={() => {
+                    window.setTimeout(() => {
+                      setIsTagDropdownOpen(false);
+                    }, 100);
+                  }}
                   onKeyDown={(event) => {
                     if (event.key === "Enter") {
                       event.preventDefault();
@@ -215,20 +227,55 @@ export function JobApplicationDetails({
                 <Button type="button" variant="outline" onClick={handleAddTag}>
                   Add
                 </Button>
+
+                {isTagDropdownOpen ? (
+                  <div
+                    className="absolute left-0 right-20 top-11 z-10 max-h-48 overflow-y-auto rounded-md border p-1 text-popover-foreground shadow-lg"
+                    style={{ backgroundColor: "hsl(var(--popover))", opacity: 1 }}
+                  >
+                    {filteredAvailableTags.length === 0 ? (
+                      <div className="px-2 py-1 text-xs text-muted-foreground">No matching tags</div>
+                    ) : (
+                      filteredAvailableTags.map((tag) => {
+                        const isSelected = selectedTags.includes(tag.name);
+
+                        return (
+                          <button
+                            key={tag.id}
+                            type="button"
+                            onMouseDown={(event) => {
+                              event.preventDefault();
+                              onToggleTag(tag.name);
+                            }}
+                            className={`flex w-full items-center justify-between rounded px-2 py-1 text-left text-sm transition-colors hover:bg-muted ${
+                              isSelected ? "bg-muted" : ""
+                            }`}
+                          >
+                            <span>#{tag.name}</span>
+                            {isSelected ? <span className="text-xs text-muted-foreground">Selected</span> : null}
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                ) : null}
               </div>
 
               <div className="flex flex-wrap gap-2">
-                {availableTags.map((tag) => (
-                  <Button
-                    key={tag.id}
-                    type="button"
-                    variant={selectedTags.includes(tag.name) ? "default" : "outline"}
-                    onClick={() => onToggleTag(tag.name)}
-                    className="h-8"
-                  >
-                    #{tag.name}
-                  </Button>
-                ))}
+                {selectedTags.length === 0 ? (
+                  <div className="text-xs text-muted-foreground">No tags selected</div>
+                ) : (
+                  selectedTags.map((tag) => (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => onToggleTag(tag)}
+                      className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition-opacity hover:opacity-80 ${getTagColorClass(tag)}`}
+                    >
+                      #{tag}
+                    </button>
+                  ))
+                )}
               </div>
             </div>
 

@@ -1,5 +1,5 @@
 import type { components } from "@/libs/api.schema.g";
-import { formatDate, getOptionLabel } from "@/libs/utils";
+import { formatDate, getOptionLabel, getTagColorClass } from "@/libs/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Filters } from "./types";
@@ -116,6 +116,18 @@ export function JobApplicationsListPanel({
             <p className="mt-1 text-xs text-muted-foreground">
               {getOptionLabel(dropdowns.jobApplicationStatuses, application.currentStatus)}
             </p>
+            {application.tags.length > 0 ? (
+              <div className="mt-2 flex flex-wrap gap-1">
+                {application.tags.map((tag) => (
+                  <span
+                    key={`${application.id}-${tag}`}
+                    className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium ${getTagColorClass(tag)}`}
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            ) : null}
             <p className="mt-1 text-xs text-muted-foreground">{formatDate(application.updatedAt)}</p>
           </div>
         ))}

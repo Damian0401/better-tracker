@@ -424,6 +424,7 @@ export function JobApplicationsPage() {
         onLoadMore={() => void handleLoadMore()}
       />
       <JobApplicationDetails
+        key={selectedApplicationId ?? (isCreating ? "create" : "empty")}
         selectedApplicationId={selectedApplicationId}
         isCreating={isCreating}
         isDetailsLoading={isDetailsLoading}

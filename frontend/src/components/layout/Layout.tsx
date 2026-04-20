@@ -17,7 +17,7 @@ export function Layout({ children }: LayoutProps) {
 
   const navItems = [
     { path: Routes.HOME, label: "Home" },
-    { path: Routes.JOB_APPLICATIONS, label: "Job Applications" },
+    { path: Routes.JOB_APPLICATIONS, label: "Applications" },
     { path: Routes.NOTES, label: "Notes" },
   ];
 
