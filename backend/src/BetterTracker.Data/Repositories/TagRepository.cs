@@ -18,6 +18,29 @@ public sealed class TagRepository : ITagRepository
             .FirstOrDefaultAsync(x => x.UserId == userId && x.Name == name, cancellationToken);
     }
 
+    public async Task RemoveOrphanedByUserIdAsync(
+        Guid userId,
+        IReadOnlyCollection<Guid> candidateTagIds,
+        Guid excludedJobApplicationId,
+        CancellationToken cancellationToken = default)
+    {
+        if (candidateTagIds.Count == 0)
+        {
+            return;
+        }
+
+        var orphanedTags = await this.dbContext.Tags
+            .Where(x => x.UserId == userId && candidateTagIds.Contains(x.Id))
+            .Where(x => !this.dbContext.JobApplicationTags
+                .Any(jat => jat.TagId == x.Id && jat.JobApplicationId != excludedJobApplicationId))
+            .ToListAsync(cancellationToken);
+
+        if (orphanedTags.Count > 0)
+        {
+            this.dbContext.Tags.RemoveRange(orphanedTags);
+        }
+    }
+
     public void Add(TagEntity tag)
     {
         this.dbContext.Tags.Add(tag);

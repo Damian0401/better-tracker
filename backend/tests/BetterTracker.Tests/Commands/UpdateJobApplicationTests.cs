@@ -200,5 +200,71 @@ public class UpdateJobApplicationTests
         this.jobApplicationRepository.DidNotReceive().RemoveSalaries(Arg.Any<IEnumerable<JobApplicationSalaryEntity>>());
         this.jobApplicationRepository.DidNotReceive().AddTag(Arg.Any<JobApplicationTagEntity>());
         this.jobApplicationRepository.DidNotReceive().RemoveTags(Arg.Any<IEnumerable<JobApplicationTagEntity>>());
+        await this.tagRepository.DidNotReceive().RemoveOrphanedByUserIdAsync(
+            Arg.Any<Guid>(),
+            Arg.Any<IReadOnlyCollection<Guid>>(),
+            Arg.Any<Guid>(),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_ShouldRemoveOrphanedTags_WhenTagIsDetachedFromJobApplication()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var jobApplicationId = Guid.NewGuid();
+        var removedTagId = Guid.NewGuid();
+        var request = new UpdateJobApplicationRequest
+        {
+            Id = jobApplicationId,
+            Title = "Updated Title",
+            JobTitle = "Updated Job",
+            CompanyName = "Updated Company",
+            WorkType = 1,
+            CurrentStatus = 0,
+            Tags = [],
+        };
+
+        var existingJobApplication = new JobApplicationEntity
+        {
+            Id = jobApplicationId,
+            UserId = userId,
+            Title = "Old",
+            JobTitle = "Old",
+            CompanyName = "Old",
+            WorkType = WorkType.Remote,
+            CurrentStatus = JobApplicationStatus.Applied,
+        };
+
+        var existingTagLink = new JobApplicationTagEntity
+        {
+            Id = Guid.NewGuid(),
+            JobApplicationId = jobApplicationId,
+            TagId = removedTagId,
+        };
+
+        this.jobApplicationRepository.GetByIdAsync(jobApplicationId, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<JobApplicationEntity?>(existingJobApplication));
+        this.jobApplicationRepository.ListSalariesByJobApplicationIdAsync(jobApplicationId, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyList<JobApplicationSalaryEntity>>([]));
+        this.jobApplicationRepository.ListTagsByJobApplicationIdAsync(jobApplicationId, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyList<JobApplicationTagEntity>>([existingTagLink]));
+
+        // Act
+        var result = await UpdateJobApplication.HandleAsync(
+            request,
+            userId,
+            this.jobApplicationRepository,
+            this.tagRepository,
+            CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        this.jobApplicationRepository.Received(1).RemoveTags(Arg.Any<IEnumerable<JobApplicationTagEntity>>());
+        await this.tagRepository.Received(1).RemoveOrphanedByUserIdAsync(
+            userId,
+            Arg.Is<IReadOnlyCollection<Guid>>(x => x.Count == 1 && x.Contains(removedTagId)),
+            jobApplicationId,
+            Arg.Any<CancellationToken>());
     }
 }

@@ -199,6 +199,16 @@ public static class UpdateJobApplication
         if (tagsToRemove.Count > 0)
         {
             jobApplicationRepository.RemoveTags(tagsToRemove);
+
+            var candidateTagIds = tagsToRemove
+                .Select(x => x.TagId)
+                .Distinct()
+                .ToList();
+            await tagRepository.RemoveOrphanedByUserIdAsync(
+                userId,
+                candidateTagIds,
+                jobApplication.Id,
+                cancellationToken);
         }
 
         foreach (var tagId in desiredTagIds)
