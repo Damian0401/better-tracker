@@ -27,6 +27,11 @@ public sealed class JobApplicationRepository : IJobApplicationRepository
         this.dbContext.JobApplications.Add(jobApplication);
     }
 
+    public void Remove(JobApplicationEntity jobApplication)
+    {
+        this.dbContext.JobApplications.Remove(jobApplication);
+    }
+
     public void AddComment(JobApplicationCommentEntity comment)
     {
         this.dbContext.JobApplicationComments.Add(comment);

@@ -6,6 +6,7 @@ public interface IJobApplicationRepository
 {
     Task<JobApplicationEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<JobApplicationCommentEntity?> GetCommentByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    void Remove(JobApplicationEntity jobApplication);
     void Update(JobApplicationEntity jobApplication);
     void Add(JobApplicationEntity jobApplication);
     void AddComment(JobApplicationCommentEntity comment);
