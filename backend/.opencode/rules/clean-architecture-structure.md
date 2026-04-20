@@ -14,7 +14,7 @@ solution-root/
     {Root}/                    # Composition root, Program.cs
     {Root}.Api/                # Endpoints, validation, OpenAPI
     {Root}.Core/               # Business logic (commands/queries)
-    {Root}.Contracts/          # Request/Response DTOs
+    {Root}.Contracts/          # Request/Response DTOs organized by feature/domain
     {Root}.Data/               # DbContext, entities, configurations, repositories
     {Root}.Data.Migrations/    # EF Core migrations
     {Root}.Common/             # Shared utilities, constants
@@ -29,7 +29,7 @@ solution-root/
 | `src/{Root}` | `Microsoft.NET.Sdk.Web` | Composition root, `Program.cs` |
 | `src/{Root}.Api` | `Microsoft.NET.Sdk` | Endpoints, validation, OpenAPI, API versioning |
 | `src/{Root}.Core` | `Microsoft.NET.Sdk` | Business logic (commands/queries) |
-| `src/{Root}.Contracts` | `Microsoft.NET.Sdk` | Request/Response DTOs |
+| `src/{Root}.Contracts` | `Microsoft.NET.Sdk` | Request/Response DTOs organized by feature/domain |
 | `src/{Root}.Data` | `Microsoft.NET.Sdk` | DbContext, entities, configurations, repositories |
 | `src/{Root}.Data.Migrations` | `Microsoft.NET.Sdk` | EF Core migrations (design-time only) |
 | `src/{Root}.Common` | `Microsoft.NET.Sdk` | Shared utilities, constants, TimeProvider registration |
@@ -62,7 +62,7 @@ dotnet test --filter "FullyQualifiedName~YourTestName"
 src/{Root} (Web entry point)
   |-- src/{Root}.Api (Endpoints, validation, OpenAPI)
   |     |-- src/{Root}.Core (Commands/Queries)
-  |     |     |-- src/{Root}.Contracts (DTOs)
+  |     |     |-- src/{Root}.Contracts (DTOs by domain)
   |     |     |     |-- src/{Root}.Data (Entities, DbContext, Repository)
   |     |     |-- src/{Root}.Data
   |     |-- src/{Root}.Data
@@ -102,6 +102,7 @@ Key decisions:
 
 ### Contracts (`{Root}.Contracts`)
 - Sealed records for request/response DTOs
+- Organize DTO files by feature/domain folders (for example `Auth`, `JobApplications`, `Notes`, `Tags`, `Common`)
 - Use top-level DTO records; helper DTOs stay in the same `.cs` file but are not nested
 
 ### Domain/Infrastructure (`{Root}.Data`)

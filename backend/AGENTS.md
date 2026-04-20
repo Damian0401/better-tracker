@@ -185,7 +185,7 @@ Always pass and propagate `CancellationToken`:
 
 ### Adding a New Command
 
-1. Create request DTO in `src/BetterTracker.Contracts/`
+1. Create request DTO in `src/BetterTracker.Contracts/{Domain}/`
 2. Create command in `src/BetterTracker.Core/{Domain}/Commands/{CommandName}.cs`
 3. Create endpoint in `src/BetterTracker.Api/{Domain}/Endpoints/{CommandName}Endpoint.cs`
 4. Create test in `tests/BetterTracker.Tests/Commands/{CommandName}Tests.cs`
@@ -193,7 +193,7 @@ Always pass and propagate `CancellationToken`:
 
 ### Adding a New Query
 
-1. Create response DTO in `src/BetterTracker.Contracts/`
+1. Create response DTO in `src/BetterTracker.Contracts/{Domain}/`
 2. Create query in `src/BetterTracker.Core/{Domain}/Queries/{QueryName}.cs`
 3. Create endpoint in `src/BetterTracker.Api/{Domain}/Endpoints/{QueryName}Endpoint.cs`
 4. Test manually or via integration tests (do NOT unit test queries)
@@ -208,6 +208,7 @@ Always pass and propagate `CancellationToken`:
 - **Always use entity-specific repositories** in commands, never generic repositories
 - **Always use DbContext directly** in queries, never repositories
 - **Contracts should avoid nested DTO records** to prevent OpenAPI schema naming collisions
+- **Contracts should be organized by feature/domain directories** (for example `Auth`, `JobApplications`, `Notes`, `Tags`, `Common`)
 
 ## Project Structure
 
@@ -217,7 +218,7 @@ backend/
 │   ├── BetterTracker/              # Composition root (Program.cs)
 │   ├── BetterTracker.Api/          # Endpoints, validation, OpenAPI
 │   ├── BetterTracker.Core/         # Commands and queries
-│   ├── BetterTracker.Contracts/    # Request/Response DTOs
+│   ├── BetterTracker.Contracts/    # Request/Response DTOs organized by feature/domain
 │   ├── BetterTracker.Data/         # DbContext, entities, repositories
 │   ├── BetterTracker.Data.Migrations/  # EF Core migrations
 │   └── BetterTracker.Common/       # Shared utilities, constants
