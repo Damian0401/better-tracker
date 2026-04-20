@@ -10,21 +10,21 @@ public static class GetJobApplicationDropdowns
         var response = new GetJobApplicationDropdownsResponse
         {
             WorkTypes = Enum.GetValues<WorkType>()
-                .Select(x => new GetJobApplicationDropdownsResponse.EnumOption
+                .Select(x => new GetJobApplicationDropdownOption
                 {
                     Value = (int)x,
                     Name = x.ToString(),
                 })
                 .ToList(),
             SalaryTypes = Enum.GetValues<SalaryType>()
-                .Select(x => new GetJobApplicationDropdownsResponse.EnumOption
+                .Select(x => new GetJobApplicationDropdownOption
                 {
                     Value = (int)x,
                     Name = x.ToString(),
                 })
                 .ToList(),
             JobApplicationStatuses = Enum.GetValues<JobApplicationStatus>()
-                .Select(x => new GetJobApplicationDropdownsResponse.EnumOption
+                .Select(x => new GetJobApplicationDropdownOption
                 {
                     Value = (int)x,
                     Name = x.ToString(),

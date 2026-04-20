@@ -127,7 +127,7 @@ public class UpdateJobApplicationEndpoint : IApiEndpoint
         public string? Experience { get; init; }
         public required int WorkType { get; init; }
         public required int CurrentStatus { get; init; }
-        public IReadOnlyList<UpdateJobApplicationRequest.SalaryDto>? Salaries { get; init; }
+        public IReadOnlyList<UpdateJobApplicationSalaryDto>? Salaries { get; init; }
         public IReadOnlyList<string>? Tags { get; init; }
     }
 

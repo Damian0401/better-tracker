@@ -28,7 +28,7 @@ public static class ListNotes
             .OrderByDescending(x => x.CreatedAt)
             .Skip(skipCount)
             .Take(take)
-            .Select(x => new ListNotesResponse.Dto
+            .Select(x => new ListNotesItemDto
             {
                 Id = x.Id,
                 Title = x.Title,

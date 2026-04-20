@@ -13,14 +13,14 @@ public sealed record CreateJobApplicationRequest
     public string? Experience { get; init; }
     public required int WorkType { get; init; }
     public required int CurrentStatus { get; init; }
-    public IReadOnlyList<SalaryDto>? Salaries { get; init; }
+    public IReadOnlyList<CreateJobApplicationSalaryDto>? Salaries { get; init; }
     public IReadOnlyList<string>? Tags { get; init; }
+}
 
-    public sealed record SalaryDto
-    {
-        public required int SalaryType { get; init; }
-        public decimal? SalaryPost { get; init; }
-        public decimal? SalaryCandidate { get; init; }
-        public string? Currency { get; init; }
-    }
+public sealed record CreateJobApplicationSalaryDto
+{
+    public required int SalaryType { get; init; }
+    public decimal? SalaryPost { get; init; }
+    public decimal? SalaryCandidate { get; init; }
+    public string? Currency { get; init; }
 }

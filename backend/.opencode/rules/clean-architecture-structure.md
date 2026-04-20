@@ -102,7 +102,7 @@ Key decisions:
 
 ### Contracts (`{Root}.Contracts`)
 - Sealed records for request/response DTOs
-- Nested Dto records
+- Use top-level DTO records; helper DTOs stay in the same `.cs` file but are not nested
 
 ### Domain/Infrastructure (`{Root}.Data`)
 - EF Core DbContext with automatic timestamp tracking

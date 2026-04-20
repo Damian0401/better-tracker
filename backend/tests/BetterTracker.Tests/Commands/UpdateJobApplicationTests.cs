@@ -64,7 +64,7 @@ public class UpdateJobApplicationTests
             CurrentStatus = 1,
             Salaries =
             [
-                new UpdateJobApplicationRequest.SalaryDto
+                new UpdateJobApplicationSalaryDto
                 {
                     SalaryType = 0,
                     SalaryPost = 10000,
@@ -128,7 +128,7 @@ public class UpdateJobApplicationTests
             CurrentStatus = 0,
             Salaries =
             [
-                new UpdateJobApplicationRequest.SalaryDto
+                new UpdateJobApplicationSalaryDto
                 {
                     SalaryType = 0,
                     SalaryPost = 15000,

@@ -15,7 +15,7 @@ public static class GetNoteById
     {
         var note = await dbContext.Notes
             .Where(x => x.Id == id && x.UserId == userId)
-            .Select(x => new GetNoteByIdResponse.Dto
+            .Select(x => new GetNoteByIdDto
             {
                 Id = x.Id,
                 Title = x.Title,

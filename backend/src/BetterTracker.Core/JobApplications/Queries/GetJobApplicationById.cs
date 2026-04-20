@@ -14,7 +14,7 @@ public static class GetJobApplicationById
     {
         var jobApplication = await dbContext.JobApplications
             .Where(x => x.Id == id && x.UserId == userId)
-            .Select(x => new GetJobApplicationByIdResponse.Dto
+            .Select(x => new GetJobApplicationByIdDto
             {
                 Id = x.Id,
                 Title = x.Title,
@@ -31,9 +31,9 @@ public static class GetJobApplicationById
                 CreatedAt = x.CreatedAt,
                 UpdatedAt = x.UpdatedAt,
                 Tags = new List<string>(),
-                Salaries = new List<GetJobApplicationByIdResponse.SalaryDto>(),
-                StatusHistory = new List<GetJobApplicationByIdResponse.StatusHistoryDto>(),
-                Comments = new List<GetJobApplicationByIdResponse.CommentDto>(),
+                Salaries = new List<GetJobApplicationByIdSalaryDto>(),
+                StatusHistory = new List<GetJobApplicationByIdStatusHistoryDto>(),
+                Comments = new List<GetJobApplicationByIdCommentDto>(),
             })
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -56,7 +56,7 @@ public static class GetJobApplicationById
         var salaries = await dbContext.JobApplicationSalaries
             .Where(x => x.JobApplicationId == id)
             .OrderBy(x => x.SalaryType)
-            .Select(x => new GetJobApplicationByIdResponse.SalaryDto
+            .Select(x => new GetJobApplicationByIdSalaryDto
             {
                 SalaryType = (int)x.SalaryType,
                 SalaryPost = x.SalaryPost,
@@ -68,7 +68,7 @@ public static class GetJobApplicationById
         var statusHistory = await dbContext.JobApplicationStatusHistory
             .Where(x => x.JobApplicationId == id)
             .OrderBy(x => x.CreatedAt)
-            .Select(x => new GetJobApplicationByIdResponse.StatusHistoryDto
+            .Select(x => new GetJobApplicationByIdStatusHistoryDto
             {
                 PreviousStatus = x.PreviousStatus.HasValue ? (int)x.PreviousStatus.Value : null,
                 NewStatus = (int)x.NewStatus,
@@ -79,7 +79,7 @@ public static class GetJobApplicationById
         var comments = await dbContext.JobApplicationComments
             .Where(x => x.JobApplicationId == id)
             .OrderByDescending(x => x.CreatedAt)
-            .Select(x => new GetJobApplicationByIdResponse.CommentDto
+            .Select(x => new GetJobApplicationByIdCommentDto
             {
                 Id = x.Id,
                 Content = x.Content,

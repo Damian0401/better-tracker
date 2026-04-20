@@ -52,6 +52,7 @@
 | Scenario | Type Choice |
 |---|---|
 | DTOs | `sealed record` |
+| Contract helper DTOs | Top-level `sealed record` in the same file (not nested) |
 | Entities | `sealed record` extending `BaseEntity<TKey>` |
 | Endpoint Parameters | `readonly struct` (or `record` if nullable properties) |
 | Endpoint Services | `readonly struct` |

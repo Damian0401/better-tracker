@@ -14,7 +14,7 @@ public static class ListMyTags
         var items = await dbContext.Tags
             .Where(x => x.UserId == userId)
             .OrderBy(x => x.Name)
-            .Select(x => new ListMyTagsResponse.Dto
+            .Select(x => new ListMyTagsItemDto
             {
                 Id = x.Id,
                 Name = x.Name,

@@ -67,7 +67,7 @@ public static class ListJobApplications
             .OrderByDescending(x => x.CreatedAt)
             .Skip(skipCount)
             .Take(take)
-            .Select(x => new ListJobApplicationsResponse.Dto
+            .Select(x => new ListJobApplicationsItemDto
             {
                 Id = x.Id,
                 Title = x.Title,

@@ -32,7 +32,7 @@ public class CreateJobApplicationTests
             Tags = ["Urgent", "Startup"],
             Salaries =
             [
-                new CreateJobApplicationRequest.SalaryDto
+                new CreateJobApplicationSalaryDto
                 {
                     SalaryType = 0,
                     SalaryPost = 10000,
@@ -75,8 +75,8 @@ public class CreateJobApplicationTests
             CurrentStatus = 0,
             Salaries =
             [
-                new CreateJobApplicationRequest.SalaryDto { SalaryType = 0 },
-                new CreateJobApplicationRequest.SalaryDto { SalaryType = 0 },
+                new CreateJobApplicationSalaryDto { SalaryType = 0 },
+                new CreateJobApplicationSalaryDto { SalaryType = 0 },
             ]
         };
 

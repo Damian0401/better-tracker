@@ -142,6 +142,7 @@ See **[Code Style Conventions](.opencode/rules/code-style-conventions.md)** for 
 
 #### Type Conventions
 - **DTOs**: `public sealed record`
+- **Contract helper DTOs**: Top-level records in the same `.cs` file (avoid nested contract DTO types)
 - **Entities**: `public sealed record` extending `BaseEntity<TKey>`
 - **Endpoint Parameters**: `internal readonly struct` (or `record` if nullable)
 - **Endpoint Services**: `internal readonly struct`
@@ -206,6 +207,7 @@ Always pass and propagate `CancellationToken`:
 - **Never skip hooks** in git commands unless explicitly requested
 - **Always use entity-specific repositories** in commands, never generic repositories
 - **Always use DbContext directly** in queries, never repositories
+- **Contracts should avoid nested DTO records** to prevent OpenAPI schema naming collisions
 
 ## Project Structure
 

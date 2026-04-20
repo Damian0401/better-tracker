@@ -71,7 +71,7 @@ public static class ListEntities
         var items = await dbContext.Set<Entity>()
             .Where(x => x.IsActive)
             .Take(take)
-            .Select(x => new ListEntitiesResponse.Dto
+            .Select(x => new ListEntitiesItemDto
             {
                 Id = x.Id,
                 Name = x.Name,
