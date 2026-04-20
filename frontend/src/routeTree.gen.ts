@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as NotesRouteImport } from './routes/notes'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as JobApplicationsRouteImport } from './routes/job-applications'
 import { Route as IndexRouteImport } from './routes/index'
 
 const RegisterRoute = RegisterRouteImport.update({
@@ -29,6 +30,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JobApplicationsRoute = JobApplicationsRouteImport.update({
+  id: '/job-applications',
+  path: '/job-applications',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -37,12 +43,14 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/job-applications': typeof JobApplicationsRoute
   '/login': typeof LoginRoute
   '/notes': typeof NotesRoute
   '/register': typeof RegisterRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/job-applications': typeof JobApplicationsRoute
   '/login': typeof LoginRoute
   '/notes': typeof NotesRoute
   '/register': typeof RegisterRoute
@@ -50,20 +58,22 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/job-applications': typeof JobApplicationsRoute
   '/login': typeof LoginRoute
   '/notes': typeof NotesRoute
   '/register': typeof RegisterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/notes' | '/register'
+  fullPaths: '/' | '/job-applications' | '/login' | '/notes' | '/register'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/notes' | '/register'
-  id: '__root__' | '/' | '/login' | '/notes' | '/register'
+  to: '/' | '/job-applications' | '/login' | '/notes' | '/register'
+  id: '__root__' | '/' | '/job-applications' | '/login' | '/notes' | '/register'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  JobApplicationsRoute: typeof JobApplicationsRoute
   LoginRoute: typeof LoginRoute
   NotesRoute: typeof NotesRoute
   RegisterRoute: typeof RegisterRoute
@@ -92,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/job-applications': {
+      id: '/job-applications'
+      path: '/job-applications'
+      fullPath: '/job-applications'
+      preLoaderRoute: typeof JobApplicationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,6 +121,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  JobApplicationsRoute: JobApplicationsRoute,
   LoginRoute: LoginRoute,
   NotesRoute: NotesRoute,
   RegisterRoute: RegisterRoute,

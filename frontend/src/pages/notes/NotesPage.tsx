@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator"
 import { ConfirmDialog } from "@/components/ConfirmDialog"
 import { toast } from "sonner"
 
-type Note = components["schemas"]["Dto"]
+type Note = components["schemas"]["ListNotesItemDto"]
 type CreateNoteRequest = components["schemas"]["CreateNoteRequest"]
 type UpdateNoteBody = components["schemas"]["UpdateNoteBody"]
 

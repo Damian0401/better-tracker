@@ -4,6 +4,41 @@
  */
 
 export interface paths {
+    "/api/v1/tags/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ListMyTagsResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/notes": {
         parameters: {
             query?: never;
@@ -165,6 +200,286 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AddJobApplicationCommentRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AddJobApplicationCommentResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/job-applications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Count?: number | string;
+                    Skip?: number | string;
+                    Status?: number | string;
+                    Tag?: string;
+                    WorkType?: number | string;
+                    Search?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ListJobApplicationsResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateJobApplicationRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CreateJobApplicationResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/comments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/job-applications/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GetJobApplicationByIdResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateJobApplicationBody"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/job-applications/dropdowns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GetJobApplicationDropdownsResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/login": {
         parameters: {
             query?: never;
@@ -256,11 +571,50 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AddJobApplicationCommentRequest: {
+            /** Format: uuid */
+            jobApplicationId: string;
+            content: string;
+        };
+        AddJobApplicationCommentResponse: {
+            /** Format: uuid */
+            id: string;
+        };
         AuthResponse: {
             token: string;
             /** Format: uuid */
             userId: string;
             userName: string;
+        };
+        CreateJobApplicationRequest: {
+            title: string;
+            jobTitle: string;
+            description?: null | string;
+            companyName: string;
+            requirements?: null | string;
+            benefits?: null | string;
+            link?: null | string;
+            technologies?: null | string;
+            experience?: null | string;
+            /** Format: int32 */
+            workType: number | string;
+            /** Format: int32 */
+            currentStatus: number | string;
+            salaries?: null | components["schemas"]["CreateJobApplicationSalaryDto"][];
+            tags?: null | string[];
+        };
+        CreateJobApplicationResponse: {
+            /** Format: uuid */
+            id: string;
+        };
+        CreateJobApplicationSalaryDto: {
+            /** Format: int32 */
+            salaryType: number | string;
+            /** Format: double */
+            salaryPost?: null | number | string;
+            /** Format: double */
+            salaryCandidate?: null | number | string;
+            currency?: null | string;
         };
         CreateNoteRequest: {
             title: string;
@@ -270,7 +624,74 @@ export interface components {
             /** Format: uuid */
             id: string;
         };
-        Dto: {
+        ErrorResponse: {
+            errors: string[];
+        };
+        GetJobApplicationByIdCommentDto: {
+            /** Format: uuid */
+            id: string;
+            content: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        GetJobApplicationByIdDto: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            jobTitle: string;
+            description?: null | string;
+            companyName: string;
+            requirements?: null | string;
+            benefits?: null | string;
+            link?: null | string;
+            technologies?: null | string;
+            experience?: null | string;
+            /** Format: int32 */
+            workType: number | string;
+            /** Format: int32 */
+            currentStatus: number | string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            tags: string[];
+            salaries: components["schemas"]["GetJobApplicationByIdSalaryDto"][];
+            statusHistory: components["schemas"]["GetJobApplicationByIdStatusHistoryDto"][];
+            comments: components["schemas"]["GetJobApplicationByIdCommentDto"][];
+        };
+        GetJobApplicationByIdResponse: {
+            jobApplication: components["schemas"]["GetJobApplicationByIdDto"];
+        };
+        GetJobApplicationByIdSalaryDto: {
+            /** Format: int32 */
+            salaryType: number | string;
+            /** Format: double */
+            salaryPost?: null | number | string;
+            /** Format: double */
+            salaryCandidate?: null | number | string;
+            currency?: null | string;
+        };
+        GetJobApplicationByIdStatusHistoryDto: {
+            /** Format: int32 */
+            previousStatus?: null | number | string;
+            /** Format: int32 */
+            newStatus: number | string;
+            /** Format: date-time */
+            changedAt: string;
+        };
+        GetJobApplicationDropdownOption: {
+            /** Format: int32 */
+            value: number | string;
+            name: string;
+        };
+        GetJobApplicationDropdownsResponse: {
+            workTypes: components["schemas"]["GetJobApplicationDropdownOption"][];
+            salaryTypes: components["schemas"]["GetJobApplicationDropdownOption"][];
+            jobApplicationStatuses: components["schemas"]["GetJobApplicationDropdownOption"][];
+        };
+        GetNoteByIdDto: {
             /** Format: uuid */
             id: string;
             title: string;
@@ -280,16 +701,52 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
         };
-        ErrorResponse: {
-            errors: string[];
-        };
         GetNoteByIdResponse: {
-            note: components["schemas"]["Dto"];
+            note: components["schemas"]["GetNoteByIdDto"];
+        };
+        ListJobApplicationsItemDto: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            jobTitle: string;
+            companyName: string;
+            /** Format: int32 */
+            workType: number | string;
+            /** Format: int32 */
+            currentStatus: number | string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            tags: string[];
+        };
+        ListJobApplicationsResponse: {
+            /** Format: int32 */
+            total: number | string;
+            items: components["schemas"]["ListJobApplicationsItemDto"][];
+        };
+        ListMyTagsItemDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+        };
+        ListMyTagsResponse: {
+            items: components["schemas"]["ListMyTagsItemDto"][];
+        };
+        ListNotesItemDto: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            content: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         ListNotesResponse: {
             /** Format: int32 */
             total: number | string;
-            items: components["schemas"]["Dto"][];
+            items: components["schemas"]["ListNotesItemDto"][];
         };
         LoginRequest: {
             login: string;
@@ -299,6 +756,32 @@ export interface components {
             userName: string;
             login: string;
             password: string;
+        };
+        UpdateJobApplicationBody: {
+            title: string;
+            jobTitle: string;
+            description?: null | string;
+            companyName: string;
+            requirements?: null | string;
+            benefits?: null | string;
+            link?: null | string;
+            technologies?: null | string;
+            experience?: null | string;
+            /** Format: int32 */
+            workType: number | string;
+            /** Format: int32 */
+            currentStatus: number | string;
+            salaries?: null | components["schemas"]["UpdateJobApplicationSalaryDto"][];
+            tags?: null | string[];
+        };
+        UpdateJobApplicationSalaryDto: {
+            /** Format: int32 */
+            salaryType: number | string;
+            /** Format: double */
+            salaryPost?: null | number | string;
+            /** Format: double */
+            salaryCandidate?: null | number | string;
+            currency?: null | string;
         };
         UpdateNoteBody: {
             title: string;
