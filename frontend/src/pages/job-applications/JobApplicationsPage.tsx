@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Api } from "@/libs/api";
 import type { components } from "@/libs/api.schema.g";
 import { normalizeTextInput } from "@/libs/utils";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { JobApplicationDetails } from "./components/JobApplicationDetails";
 import { JobApplicationsListPanel } from "./components/JobApplicationsListPanel";
 import type { Filters } from "./components/types";
@@ -76,6 +77,7 @@ export function JobApplicationsPage() {
   const [isDetailsLoading, setIsDetailsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isCommentSubmitting, setIsCommentSubmitting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const isModified = JSON.stringify(formData) !== JSON.stringify(baselineFormData);
 
@@ -404,6 +406,37 @@ export function JobApplicationsPage() {
     await fetchApplicationDetails(selectedApplicationId);
   };
 
+  const handleDeleteApplication = async () => {
+    if (!selectedApplicationId) {
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const response = await Api.DELETE("/api/v1/job-applications/{id}", {
+        params: { path: { id: selectedApplicationId } },
+      });
+
+      if (response.error) {
+        toast.error("Failed to delete job application");
+        return;
+      }
+
+      toast.success("Job application deleted");
+
+      setApplications((prev) => prev.filter((item) => item.id !== selectedApplicationId));
+      setTotal((prev) => Math.max(0, prev - 1));
+      resetDetails();
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteClick = () => {
+    setShowDeleteDialog(true);
+  };
+
   return (
     <div className="flex h-full">
       <JobApplicationsListPanel
@@ -440,8 +473,19 @@ export function JobApplicationsPage() {
         onAddTag={handleAddTag}
         onToggleTag={handleToggleTag}
         onSave={() => void handleSave()}
+        onDelete={handleDeleteClick}
         onAddComment={handleCreateComment}
         onDeleteComment={(id) => void handleDeleteComment(id)}
+      />
+      <ConfirmDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={() => void handleDeleteApplication()}
+        title="Delete Job Application"
+        description="Are you sure you want to delete this job application? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
       />
     </div>
   );

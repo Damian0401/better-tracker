@@ -29,6 +29,7 @@ interface JobApplicationDetailsProps {
   onAddTag: (tag: string) => boolean;
   onToggleTag: (tag: string) => void;
   onSave: () => void;
+  onDelete: () => void;
   onAddComment: (content: string) => Promise<boolean>;
   onDeleteComment: (id: string) => void;
 }
@@ -49,6 +50,7 @@ export function JobApplicationDetails({
   onAddTag,
   onToggleTag,
   onSave,
+  onDelete,
   onAddComment,
   onDeleteComment,
 }: JobApplicationDetailsProps) {
@@ -285,9 +287,15 @@ export function JobApplicationDetails({
               <Button onClick={onSave} disabled={isSaving || (!isCreating && !isModified)}>
                 {isSaving ? "Saving..." : "Save"}
               </Button>
-              <Button variant="outline" onClick={onClose} disabled={isSaving}>
-                Cancel
-              </Button>
+              {isCreating ? (
+                <Button variant="outline" onClick={onClose} disabled={isSaving}>
+                  Cancel
+                </Button>
+              ) : (
+                <Button variant="destructive" onClick={onDelete} disabled={isSaving}>
+                  Delete
+                </Button>
+              )}
             </div>
 
             {!isCreating ? (
