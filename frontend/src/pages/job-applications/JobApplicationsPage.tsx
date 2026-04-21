@@ -3,6 +3,7 @@ import { Api } from "@/libs/api";
 import type { components } from "@/libs/api.schema.g";
 import { normalizeTextInput } from "@/libs/utils";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { ListWithSideSheetLayout } from "@/components/layout/ListWithSideSheetLayout";
 import { JobApplicationDetails } from "./components/JobApplicationDetails";
 import { JobApplicationsListPanel } from "./components/JobApplicationsListPanel";
 import type { Filters } from "./components/types";
@@ -438,44 +439,55 @@ export function JobApplicationsPage() {
   };
 
   return (
-    <div className="flex h-full">
-      <JobApplicationsListPanel
-        applications={applications}
-        selectedApplicationId={selectedApplicationId}
-        filters={filters}
-        dropdowns={dropdowns}
-        availableTags={availableTags}
-        total={total}
-        isListLoading={isListLoading}
-        isLoadingMore={isLoadingMore}
-        onCreate={handleCreate}
-        onSearchChange={(value) => setFilters((prev) => ({ ...prev, search: value }))}
-        onStatusChange={(value) => setFilters((prev) => ({ ...prev, status: value }))}
-        onWorkTypeChange={(value) => setFilters((prev) => ({ ...prev, workType: value }))}
-        onTagChange={(value) => setFilters((prev) => ({ ...prev, tag: value }))}
-        onSelect={(id) => void handleSelect(id)}
-        onLoadMore={() => void handleLoadMore()}
-      />
-      <JobApplicationDetails
-        key={selectedApplicationId ?? (isCreating ? "create" : "empty")}
-        selectedApplicationId={selectedApplicationId}
-        isCreating={isCreating}
-        isDetailsLoading={isDetailsLoading}
-        formData={formData}
-        dropdowns={dropdowns}
-        availableTags={availableTags}
-        isSaving={isSaving}
-        isModified={isModified}
-        comments={comments}
-        isCommentSubmitting={isCommentSubmitting}
-        onClose={handleCloseDetails}
-        onFormChange={handleFormChange}
-        onAddTag={handleAddTag}
-        onToggleTag={handleToggleTag}
-        onSave={() => void handleSave()}
-        onDelete={handleDeleteClick}
-        onAddComment={handleCreateComment}
-        onDeleteComment={(id) => void handleDeleteComment(id)}
+    <>
+      <ListWithSideSheetLayout
+        sheetOpen={isCreating || !!selectedApplicationId}
+        onSheetOpenChange={(open) => {
+          if (!open) {
+            handleCloseDetails();
+          }
+        }}
+        leftPanel={
+          <JobApplicationsListPanel
+            applications={applications}
+            selectedApplicationId={selectedApplicationId}
+            filters={filters}
+            dropdowns={dropdowns}
+            availableTags={availableTags}
+            total={total}
+            isListLoading={isListLoading}
+            isLoadingMore={isLoadingMore}
+            onCreate={handleCreate}
+            onSearchChange={(value) => setFilters((prev) => ({ ...prev, search: value }))}
+            onStatusChange={(value) => setFilters((prev) => ({ ...prev, status: value }))}
+            onWorkTypeChange={(value) => setFilters((prev) => ({ ...prev, workType: value }))}
+            onTagChange={(value) => setFilters((prev) => ({ ...prev, tag: value }))}
+            onSelect={(id) => void handleSelect(id)}
+            onLoadMore={() => void handleLoadMore()}
+          />
+        }
+        sheetContent={
+          <JobApplicationDetails
+            key={selectedApplicationId ?? (isCreating ? "create" : "empty")}
+            isCreating={isCreating}
+            isDetailsLoading={isDetailsLoading}
+            formData={formData}
+            dropdowns={dropdowns}
+            availableTags={availableTags}
+            isSaving={isSaving}
+            isModified={isModified}
+            comments={comments}
+            isCommentSubmitting={isCommentSubmitting}
+            onClose={handleCloseDetails}
+            onFormChange={handleFormChange}
+            onAddTag={handleAddTag}
+            onToggleTag={handleToggleTag}
+            onSave={() => void handleSave()}
+            onDelete={handleDeleteClick}
+            onAddComment={handleCreateComment}
+            onDeleteComment={(id) => void handleDeleteComment(id)}
+          />
+        }
       />
       <ConfirmDialog
         open={showDeleteDialog}
@@ -487,6 +499,6 @@ export function JobApplicationsPage() {
         cancelText="Cancel"
         variant="destructive"
       />
-    </div>
+    </>
   );
 }

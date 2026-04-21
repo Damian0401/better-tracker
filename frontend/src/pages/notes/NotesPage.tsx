@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { ConfirmDialog } from "@/components/ConfirmDialog"
+import { ListWithSideSheetLayout } from "@/components/layout/ListWithSideSheetLayout"
 import { toast } from "sonner"
 
 type Note = components["schemas"]["ListNotesItemDto"]
@@ -178,112 +179,116 @@ export function NotesPage() {
   }
 
   return (
-    <div className="flex h-full">
-      {/* Notes List */}
-      <div className="flex w-80 flex-col border-r">
-        <div className="border-b p-4">
-          <Button onClick={handleCreate} className="w-full">
-            Create Note
-          </Button>
-        </div>
-        <div className="min-h-0 flex-1 overflow-y-auto">
-          {notes.map((note) => (
-            <div
-              key={note.id}
-              onClick={() => handleSelectNote(note)}
-              className={`cursor-pointer border-b p-4 transition-colors hover:bg-muted ${
-                selectedNote?.id === note.id ? "bg-muted" : ""
-              }`}
-            >
-              <h3 className="font-medium truncate">{note.title}</h3>
-              <p className="text-sm text-muted-foreground mt-1">
-                {new Date(note.updatedAt).toLocaleDateString()}
-              </p>
-            </div>
-          ))}
-          {notes.length < total && (
-            <div className="p-4">
-              <Button
-                onClick={handleLoadMore}
-                variant="outline"
-                className="w-full"
-                disabled={isLoadingMore}
-              >
-                {isLoadingMore ? "Loading..." : "Load More"}
+    <>
+      <ListWithSideSheetLayout
+        sheetWidthClassName="max-w-3xl"
+        sheetOpen={isCreating || !!selectedNote}
+        onSheetOpenChange={(open) => {
+          if (!open) {
+            handleClose()
+          }
+        }}
+        leftPanel={
+          <>
+            <div className="border-b p-4">
+              <Button onClick={handleCreate} className="w-full">
+                Create Note
               </Button>
             </div>
-          )}
-          {notes.length === 0 && (
-            <div className="p-4 text-center text-muted-foreground">
-              No notes yet. Create your first note!
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              {notes.map((note) => (
+                <div
+                  key={note.id}
+                  onClick={() => handleSelectNote(note)}
+                  className={`cursor-pointer border-b p-4 transition-colors hover:bg-muted ${
+                    selectedNote?.id === note.id ? "bg-muted" : ""
+                  }`}
+                >
+                  <h3 className="truncate font-medium">{note.title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {new Date(note.updatedAt).toLocaleDateString()}
+                  </p>
+                </div>
+              ))}
+              {notes.length < total && (
+                <div className="p-4">
+                  <Button
+                    onClick={handleLoadMore}
+                    variant="outline"
+                    className="w-full"
+                    disabled={isLoadingMore}
+                  >
+                    {isLoadingMore ? "Loading..." : "Load More"}
+                  </Button>
+                </div>
+              )}
+              {notes.length === 0 && (
+                <div className="p-4 text-center text-muted-foreground">
+                  No notes yet. Create your first note!
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Note Details */}
-      <div className="flex-1 p-6">
-        {(selectedNote || isCreating) ? (
-          <Card>
-            <CardHeader className="relative">
-              <CardTitle>{isCreating ? "Create New Note" : "Edit Note"}</CardTitle>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-4 top-4"
-                onClick={handleClose}
-              >
-                <span className="text-xl">×</span>
-              </Button>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Title</label>
-                <Input
-                  value={formData.title}
-                  onChange={(e) => handleFormChange("title", e.target.value)}
-                  placeholder="Enter note title"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Content</label>
-                <Textarea
-                  value={formData.content}
-                  onChange={(e) => handleFormChange("content", e.target.value)}
-                  placeholder="Enter note content"
-                  rows={10}
-                />
-              </div>
-              <Separator />
-              <div className="flex gap-2">
-                {isCreating ? (
-                  <>
-                    <Button onClick={handleSave} disabled={isLoading}>
-                      {isLoading ? "Saving..." : "Save"}
-                    </Button>
-                    <Button onClick={handleCancel} variant="outline" disabled={isLoading}>
-                      Cancel
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button onClick={handleSave} disabled={isLoading || !isModified}>
-                      {isLoading ? "Saving..." : "Save"}
-                    </Button>
-                    <Button onClick={handleDeleteClick} variant="destructive" disabled={isLoading}>
-                      Delete
-                    </Button>
-                  </>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="flex h-full items-center justify-center text-muted-foreground">
-            Select a note to view details or create a new one
+          </>
+        }
+        sheetContent={
+          <div className="h-full overflow-y-auto p-6">
+            <Card className="border-0 shadow-none">
+              <CardHeader className="relative">
+                <CardTitle>{isCreating ? "Create New Note" : "Edit Note"}</CardTitle>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-4 top-4"
+                  onClick={handleClose}
+                >
+                  <span className="text-xl">×</span>
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Title</label>
+                  <Input
+                    value={formData.title}
+                    onChange={(e) => handleFormChange("title", e.target.value)}
+                    placeholder="Enter note title"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Content</label>
+                  <Textarea
+                    value={formData.content}
+                    onChange={(e) => handleFormChange("content", e.target.value)}
+                    placeholder="Enter note content"
+                    rows={10}
+                  />
+                </div>
+                <Separator />
+                <div className="flex gap-2">
+                  {isCreating ? (
+                    <>
+                      <Button onClick={handleSave} disabled={isLoading}>
+                        {isLoading ? "Saving..." : "Save"}
+                      </Button>
+                      <Button onClick={handleCancel} variant="outline" disabled={isLoading}>
+                        Cancel
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button onClick={handleSave} disabled={isLoading || !isModified}>
+                        {isLoading ? "Saving..." : "Save"}
+                      </Button>
+                      <Button onClick={handleDeleteClick} variant="destructive" disabled={isLoading}>
+                        Delete
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        )}
-      </div>
+        }
+      />
 
       <ConfirmDialog
         open={showDeleteDialog}
@@ -295,6 +300,6 @@ export function NotesPage() {
         cancelText="Cancel"
         variant="destructive"
       />
-    </div>
+    </>
   )
 }

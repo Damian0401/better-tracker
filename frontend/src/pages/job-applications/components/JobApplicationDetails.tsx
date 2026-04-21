@@ -14,7 +14,6 @@ type CommentDto = components["schemas"]["GetJobApplicationByIdCommentDto"];
 type ListMyTagsItemDto = components["schemas"]["ListMyTagsItemDto"];
 
 interface JobApplicationDetailsProps {
-  selectedApplicationId: string | null;
   isCreating: boolean;
   isDetailsLoading: boolean;
   formData: UpdateRequest;
@@ -35,7 +34,6 @@ interface JobApplicationDetailsProps {
 }
 
 export function JobApplicationDetails({
-  selectedApplicationId,
   isCreating,
   isDetailsLoading,
   formData,
@@ -83,20 +81,19 @@ export function JobApplicationDetails({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-6">
-      {selectedApplicationId || isCreating ? (
-        <Card>
-          <CardHeader className="relative">
-            <CardTitle>{isCreating ? "Create Job Application" : "Edit Job Application"}</CardTitle>
-            <Button variant="ghost" size="icon" className="absolute right-4 top-4" onClick={onClose}>
-              <span className="text-xl">x</span>
-            </Button>
-          </CardHeader>
+    <div className="h-full overflow-y-auto p-6">
+      <Card className="border-0 shadow-none">
+        <CardHeader className="relative">
+          <CardTitle>{isCreating ? "Create Job Application" : "Edit Job Application"}</CardTitle>
+          <Button variant="ghost" size="icon" className="absolute right-4 top-4" onClick={onClose}>
+            <span className="text-xl">x</span>
+          </Button>
+        </CardHeader>
 
-          <CardContent className="space-y-4">
-            {isDetailsLoading && !isCreating ? (
-              <div className="text-sm text-muted-foreground">Loading details...</div>
-            ) : null}
+        <CardContent className="space-y-4">
+          {isDetailsLoading && !isCreating ? (
+            <div className="text-sm text-muted-foreground">Loading details...</div>
+          ) : null}
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
@@ -298,26 +295,21 @@ export function JobApplicationDetails({
               )}
             </div>
 
-            {!isCreating ? (
-              <>
-                <Separator />
-                <JobApplicationCommentsSection
-                  comments={comments}
-                  newComment={newComment}
-                  isCommentSubmitting={isCommentSubmitting}
-                  onNewCommentChange={setNewComment}
-                  onAddComment={() => void handleAddComment()}
-                  onDeleteComment={onDeleteComment}
-                />
-              </>
-            ) : null}
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="flex h-full items-center justify-center text-muted-foreground">
-          Select an application to view details or create a new one
-        </div>
-      )}
+          {!isCreating ? (
+            <>
+              <Separator />
+              <JobApplicationCommentsSection
+                comments={comments}
+                newComment={newComment}
+                isCommentSubmitting={isCommentSubmitting}
+                onNewCommentChange={setNewComment}
+                onAddComment={() => void handleAddComment()}
+                onDeleteComment={onDeleteComment}
+              />
+            </>
+          ) : null}
+        </CardContent>
+      </Card>
     </div>
   );
 }

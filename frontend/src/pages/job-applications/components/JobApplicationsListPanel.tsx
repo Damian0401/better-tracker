@@ -44,7 +44,7 @@ export function JobApplicationsListPanel({
   onLoadMore,
 }: JobApplicationsListPanelProps) {
   return (
-    <div className="flex w-96 flex-col border-r">
+    <div className="flex h-full flex-col">
       <div className="space-y-3 border-b p-4">
         <Button onClick={onCreate} className="w-full">
           Create Application
@@ -56,9 +56,9 @@ export function JobApplicationsListPanel({
           onChange={(event) => onSearchChange(event.target.value)}
         />
 
-        <div className="grid grid-cols-1 gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <select
-            className="h-9 rounded-md border bg-background px-3 text-sm"
+            className="h-9 min-w-40 flex-1 basis-56 rounded-md border bg-background px-3 text-sm"
             value={filters.status}
             onChange={(event) => onStatusChange(event.target.value)}
           >
@@ -71,7 +71,7 @@ export function JobApplicationsListPanel({
           </select>
 
           <select
-            className="h-9 rounded-md border bg-background px-3 text-sm"
+            className="h-9 min-w-40 flex-1 basis-56 rounded-md border bg-background px-3 text-sm"
             value={filters.workType}
             onChange={(event) => onWorkTypeChange(event.target.value)}
           >
@@ -84,7 +84,7 @@ export function JobApplicationsListPanel({
           </select>
 
           <select
-            className="h-9 rounded-md border bg-background px-3 text-sm"
+            className="h-9 min-w-40 flex-1 basis-56 rounded-md border bg-background px-3 text-sm"
             value={filters.tag}
             onChange={(event) => onTagChange(event.target.value)}
           >
