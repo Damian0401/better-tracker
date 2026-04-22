@@ -13,6 +13,7 @@ type DropdownsResponse = components["schemas"]["GetJobApplicationDropdownsRespon
 type ListItem = components["schemas"]["ListJobApplicationsItemDto"];
 type DetailsDto = components["schemas"]["GetJobApplicationByIdDto"];
 type CommentDto = components["schemas"]["GetJobApplicationByIdCommentDto"];
+type StatusHistoryDto = components["schemas"]["GetJobApplicationByIdStatusHistoryDto"];
 type CreateRequest = components["schemas"]["CreateJobApplicationRequest"];
 type UpdateRequest = components["schemas"]["UpdateJobApplicationBody"];
 type ListMyTagsItemDto = components["schemas"]["ListMyTagsItemDto"];
@@ -63,6 +64,7 @@ export function JobApplicationsPage() {
   const [formData, setFormData] = useState<UpdateRequest>(emptyFormData);
   const [baselineFormData, setBaselineFormData] = useState<UpdateRequest>(emptyFormData);
   const [comments, setComments] = useState<CommentDto[]>([]);
+  const [statusHistory, setStatusHistory] = useState<StatusHistoryDto[]>([]);
   const [availableTags, setAvailableTags] = useState<ListMyTagsItemDto[]>([]);
   const [dropdowns, setDropdowns] = useState<DropdownsResponse>({
     workTypes: [],
@@ -184,6 +186,7 @@ export function JobApplicationsPage() {
       setFormData(mapped);
       setBaselineFormData(mapped);
       setComments(details.comments);
+      setStatusHistory(details.statusHistory);
     } finally {
       setIsDetailsLoading(false);
     }
@@ -195,6 +198,7 @@ export function JobApplicationsPage() {
     setFormData(emptyFormData);
     setBaselineFormData(emptyFormData);
     setComments([]);
+    setStatusHistory([]);
   };
 
   useEffect(() => {
@@ -383,11 +387,12 @@ export function JobApplicationsPage() {
                 workType: formData.workType,
                 currentStatus: formData.currentStatus,
                 tags: formData.tags ?? [],
-              }
+                }
             : item
         )
       );
 
+      await fetchApplicationDetails(selectedApplicationId);
       await fetchTags();
     } finally {
       setIsSaving(false);
@@ -513,6 +518,7 @@ export function JobApplicationsPage() {
             isSaving={isSaving}
             isModified={isModified}
             comments={comments}
+            statusHistory={statusHistory}
             isCommentSubmitting={isCommentSubmitting}
             onClose={handleCloseDetails}
             onFormChange={handleFormChange}

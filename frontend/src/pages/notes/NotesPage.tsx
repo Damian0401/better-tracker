@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { ConfirmDialog } from "@/components/ConfirmDialog"
+import { FormField } from "@/components/FormField"
 import { ListWithSideSheetLayout } from "@/components/layout/ListWithSideSheetLayout"
 import { toast } from "sonner"
 
@@ -241,27 +242,25 @@ export function NotesPage() {
                   className="absolute right-4 top-4"
                   onClick={handleClose}
                 >
-                  <span className="text-xl">×</span>
+                  <span className="text-xl">x</span>
                 </Button>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Title</label>
+                <FormField label="Title">
                   <Input
                     value={formData.title}
                     onChange={(e) => handleFormChange("title", e.target.value)}
                     placeholder="Enter note title"
                   />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Content</label>
+                </FormField>
+                <FormField label="Content">
                   <Textarea
                     value={formData.content}
                     onChange={(e) => handleFormChange("content", e.target.value)}
                     placeholder="Enter note content"
                     rows={10}
                   />
-                </div>
+                </FormField>
                 <Separator />
                 <div className="flex gap-2">
                   {isCreating ? (

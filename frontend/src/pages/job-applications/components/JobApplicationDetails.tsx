@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import type { components } from "@/libs/api.schema.g";
 import { getTagColorClass } from "@/libs/utils";
 import { Button } from "@/components/ui/button";
@@ -6,11 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { FormField } from "@/components/FormField";
 import { JobApplicationCommentsSection } from "./JobApplicationCommentsSection";
 
 type DropdownsResponse = components["schemas"]["GetJobApplicationDropdownsResponse"];
 type UpdateRequest = components["schemas"]["UpdateJobApplicationBody"];
 type CommentDto = components["schemas"]["GetJobApplicationByIdCommentDto"];
+type StatusHistoryDto = components["schemas"]["GetJobApplicationByIdStatusHistoryDto"];
 type ListMyTagsItemDto = components["schemas"]["ListMyTagsItemDto"];
 
 interface JobApplicationDetailsProps {
@@ -22,6 +25,7 @@ interface JobApplicationDetailsProps {
   isSaving: boolean;
   isModified: boolean;
   comments: CommentDto[];
+  statusHistory: StatusHistoryDto[];
   isCommentSubmitting: boolean;
   onClose: () => void;
   onFormChange: (field: keyof UpdateRequest, value: UpdateRequest[keyof UpdateRequest]) => void;
@@ -42,6 +46,7 @@ export function JobApplicationDetails({
   isSaving,
   isModified,
   comments,
+  statusHistory,
   isCommentSubmitting,
   onClose,
   onFormChange,
@@ -55,8 +60,23 @@ export function JobApplicationDetails({
   const [tagInput, setTagInput] = useState("");
   const [newComment, setNewComment] = useState("");
   const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
+  const [isStatusHistoryOpen, setIsStatusHistoryOpen] = useState(false);
   const selectedTags = formData.tags ?? [];
   const normalizedTagInput = tagInput.trim().toLowerCase();
+  const sortedStatusHistory = [...statusHistory].sort(
+    (left, right) => Date.parse(right.changedAt) - Date.parse(left.changedAt),
+  );
+
+  const getStatusName = (statusValue: number | string | null | undefined) => {
+    if (statusValue === null || statusValue === undefined) {
+      return "Unknown";
+    }
+
+    return (
+      dropdowns.jobApplicationStatuses.find((option) => option.value.toString() === statusValue.toString())?.name ??
+      statusValue.toString()
+    );
+  };
 
   const filteredAvailableTags = availableTags.filter((tag) => {
     if (!normalizedTagInput) {
@@ -96,32 +116,51 @@ export function JobApplicationDetails({
           ) : null}
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-medium">Job Title</label>
+              <FormField label="Job Title" className="md:col-span-2">
                 <Input
                   value={formData.jobTitle}
                   onChange={(event) => onFormChange("jobTitle", event.target.value)}
                   placeholder="Position title"
                 />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Company</label>
+              </FormField>
+              <FormField label="Company">
                 <Input
                   value={formData.companyName}
                   onChange={(event) => onFormChange("companyName", event.target.value)}
                   placeholder="Company name"
                 />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Link</label>
+              </FormField>
+              <FormField label="Link">
                 <Input
                   value={formData.link ?? ""}
                   onChange={(event) => onFormChange("link", event.target.value)}
                   placeholder="https://..."
                 />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Status</label>
+              </FormField>
+              <FormField
+                label={
+                  <>
+                    <label className="text-sm font-medium">Status</label>
+                    {!isCreating ? (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-4 w-4 p-0"
+                        onClick={() => setIsStatusHistoryOpen((prev) => !prev)}
+                        title={isStatusHistoryOpen ? "Hide status history" : "Show status history"}
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="9" />
+                          <path d="M12 7v5l3 2" />
+                        </svg>
+                        <span className="sr-only">Toggle status history</span>
+                      </Button>
+                    ) : null}
+                  </>
+                }
+                labelRowClassName="gap-1"
+              >
                 <select
                   className="h-9 w-full rounded-md border bg-background px-3 text-sm"
                   value={formData.currentStatus.toString()}
@@ -133,9 +172,8 @@ export function JobApplicationDetails({
                     </option>
                   ))}
                 </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Work Type</label>
+              </FormField>
+              <FormField label="Work Type">
                 <select
                   className="h-9 w-full rounded-md border bg-background px-3 text-sm"
                   value={formData.workType.toString()}
@@ -147,56 +185,50 @@ export function JobApplicationDetails({
                     </option>
                   ))}
                 </select>
-              </div>
+              </FormField>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Technologies</label>
+            <FormField label="Technologies">
               <Input
                 value={formData.technologies ?? ""}
                 onChange={(event) => onFormChange("technologies", event.target.value)}
                 placeholder="React, TypeScript, .NET"
               />
-            </div>
+            </FormField>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Experience</label>
+            <FormField label="Experience">
               <Input
                 value={formData.experience ?? ""}
                 onChange={(event) => onFormChange("experience", event.target.value)}
                 placeholder="Mid / Senior / 3+ years"
               />
-            </div>
+            </FormField>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Description</label>
+            <FormField label="Description">
               <Textarea
                 value={formData.description ?? ""}
                 onChange={(event) => onFormChange("description", event.target.value)}
                 rows={4}
               />
-            </div>
+            </FormField>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Requirements</label>
+            <FormField label="Requirements">
               <Textarea
                 value={formData.requirements ?? ""}
                 onChange={(event) => onFormChange("requirements", event.target.value)}
                 rows={4}
               />
-            </div>
+            </FormField>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Benefits</label>
+            <FormField label="Benefits">
               <Textarea
                 value={formData.benefits ?? ""}
                 onChange={(event) => onFormChange("benefits", event.target.value)}
                 rows={4}
               />
-            </div>
+            </FormField>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Tags</label>
+            <FormField label="Tags">
               <div className="relative flex gap-2">
                 <Input
                   value={tagInput}
@@ -268,7 +300,7 @@ export function JobApplicationDetails({
                   ))
                 )}
               </div>
-            </div>
+            </FormField>
 
             <Separator />
 
@@ -302,6 +334,49 @@ export function JobApplicationDetails({
           ) : null}
         </CardContent>
       </Card>
+
+      <DialogPrimitive.Root open={isStatusHistoryOpen} onOpenChange={setIsStatusHistoryOpen}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-transparent" />
+          <DialogPrimitive.Content
+            style={{
+              backgroundColor: "hsl(var(--background))",
+              borderColor: "hsl(var(--border))",
+            }}
+            className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg"
+          >
+            <DialogPrimitive.Title className="text-lg font-semibold">Status History</DialogPrimitive.Title>
+
+            <div className="max-h-80 space-y-2 overflow-y-auto">
+              {sortedStatusHistory.length === 0 ? (
+                <div className="rounded-md border p-3 text-sm text-muted-foreground">No status history yet</div>
+              ) : (
+                sortedStatusHistory.map((historyItem, index) => {
+                  const previousStatusLabel = getStatusName(historyItem.previousStatus);
+                  const nextStatusLabel = getStatusName(historyItem.newStatus);
+
+                  return (
+                    <div key={`${historyItem.changedAt}-${index}`} className="rounded-md border bg-muted/40 p-3">
+                      <div className="text-xs text-muted-foreground">{new Date(historyItem.changedAt).toLocaleString()}</div>
+                      <div className="text-sm">
+                        {historyItem.previousStatus === null
+                          ? `Set to ${nextStatusLabel}`
+                          : `${previousStatusLabel} -> ${nextStatusLabel}`}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            <div className="flex justify-end">
+              <DialogPrimitive.Close asChild>
+                <Button variant="outline">Close</Button>
+              </DialogPrimitive.Close>
+            </div>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
     </div>
   );
 }
