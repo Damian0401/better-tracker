@@ -25,7 +25,6 @@ public class UpdateJobApplicationTests
         var request = new UpdateJobApplicationRequest
         {
             Id = Guid.NewGuid(),
-            Title = "Title",
             JobTitle = "Job Title",
             CompanyName = "Company",
             WorkType = 1,
@@ -57,7 +56,6 @@ public class UpdateJobApplicationTests
         var request = new UpdateJobApplicationRequest
         {
             Id = Guid.NewGuid(),
-            Title = "New Title",
             JobTitle = "New Job Title",
             CompanyName = "New Company",
             WorkType = 2,
@@ -79,7 +77,6 @@ public class UpdateJobApplicationTests
         {
             Id = request.Id,
             UserId = userId,
-            Title = "Old Title",
             JobTitle = "Old Job Title",
             CompanyName = "Old Company",
             WorkType = WorkType.Remote,
@@ -121,7 +118,6 @@ public class UpdateJobApplicationTests
         var request = new UpdateJobApplicationRequest
         {
             Id = jobApplicationId,
-            Title = "Updated Title",
             JobTitle = "Updated Job",
             CompanyName = "Updated Company",
             WorkType = 1,
@@ -143,7 +139,6 @@ public class UpdateJobApplicationTests
         {
             Id = jobApplicationId,
             UserId = userId,
-            Title = "Old",
             JobTitle = "Old",
             CompanyName = "Old",
             WorkType = WorkType.Remote,
@@ -217,7 +212,6 @@ public class UpdateJobApplicationTests
         var request = new UpdateJobApplicationRequest
         {
             Id = jobApplicationId,
-            Title = "Updated Title",
             JobTitle = "Updated Job",
             CompanyName = "Updated Company",
             WorkType = 1,
@@ -229,7 +223,6 @@ public class UpdateJobApplicationTests
         {
             Id = jobApplicationId,
             UserId = userId,
-            Title = "Old",
             JobTitle = "Old",
             CompanyName = "Old",
             WorkType = WorkType.Remote,

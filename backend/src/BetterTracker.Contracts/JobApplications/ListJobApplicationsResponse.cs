@@ -9,7 +9,6 @@ public sealed record ListJobApplicationsResponse
 public sealed record ListJobApplicationsItemDto
 {
     public required Guid Id { get; init; }
-    public required string Title { get; init; }
     public required string JobTitle { get; init; }
     public required string CompanyName { get; init; }
     public required int WorkType { get; init; }

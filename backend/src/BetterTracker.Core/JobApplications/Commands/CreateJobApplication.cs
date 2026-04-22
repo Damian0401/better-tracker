@@ -43,7 +43,6 @@ public static class CreateJobApplication
         var jobApplication = new JobApplicationEntity
         {
             UserId = userId,
-            Title = request.Title.Trim(),
             JobTitle = request.JobTitle.Trim(),
             Description = NormalizeNullable(request.Description),
             CompanyName = request.CompanyName.Trim(),

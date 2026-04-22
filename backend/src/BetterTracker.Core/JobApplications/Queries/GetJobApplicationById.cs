@@ -17,7 +17,6 @@ public static class GetJobApplicationById
             .Select(x => new GetJobApplicationByIdDto
             {
                 Id = x.Id,
-                Title = x.Title,
                 JobTitle = x.JobTitle,
                 Description = x.Description,
                 CompanyName = x.CompanyName,

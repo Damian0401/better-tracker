@@ -96,12 +96,12 @@ export function JobApplicationDetails({
           ) : null}
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Title</label>
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-medium">Job Title</label>
                 <Input
-                  value={formData.title}
-                  onChange={(event) => onFormChange("title", event.target.value)}
-                  placeholder="Internal title"
+                  value={formData.jobTitle}
+                  onChange={(event) => onFormChange("jobTitle", event.target.value)}
+                  placeholder="Position title"
                 />
               </div>
               <div className="space-y-2">
@@ -110,14 +110,6 @@ export function JobApplicationDetails({
                   value={formData.companyName}
                   onChange={(event) => onFormChange("companyName", event.target.value)}
                   placeholder="Company name"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Job Title</label>
-                <Input
-                  value={formData.jobTitle}
-                  onChange={(event) => onFormChange("jobTitle", event.target.value)}
-                  placeholder="Position title"
                 />
               </div>
               <div className="space-y-2">

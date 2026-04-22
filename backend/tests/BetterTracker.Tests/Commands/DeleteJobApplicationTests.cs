@@ -65,7 +65,6 @@ public class DeleteJobApplicationTests
         {
             Id = jobApplicationId,
             UserId = userId,
-            Title = "Title",
             JobTitle = "Job",
             CompanyName = "Company",
             WorkType = WorkType.Remote,

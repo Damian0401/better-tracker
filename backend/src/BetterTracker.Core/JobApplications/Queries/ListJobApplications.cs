@@ -43,7 +43,6 @@ public static class ListJobApplications
         {
             var normalizedSearch = search.Trim();
             query = query.Where(x =>
-                x.Title.Contains(normalizedSearch) ||
                 x.JobTitle.Contains(normalizedSearch) ||
                 x.CompanyName.Contains(normalizedSearch));
         }
@@ -70,7 +69,6 @@ public static class ListJobApplications
             .Select(x => new ListJobApplicationsItemDto
             {
                 Id = x.Id,
-                Title = x.Title,
                 JobTitle = x.JobTitle,
                 CompanyName = x.CompanyName,
                 WorkType = (int)x.WorkType,

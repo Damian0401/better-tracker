@@ -33,7 +33,6 @@ public class UpdateJobApplicationEndpoint : IApiEndpoint
         var request = new UpdateJobApplicationRequest
         {
             Id = parameters.Id,
-            Title = parameters.Request.Title,
             JobTitle = parameters.Request.JobTitle,
             Description = parameters.Request.Description,
             CompanyName = parameters.Request.CompanyName,
@@ -75,10 +74,6 @@ public class UpdateJobApplicationEndpoint : IApiEndpoint
     {
         public Validator()
         {
-            this.RuleFor(x => x.Request.Title)
-                .NotEmpty()
-                .MaximumLength(200);
-
             this.RuleFor(x => x.Request.JobTitle)
                 .NotEmpty()
                 .MaximumLength(200);
@@ -116,7 +111,6 @@ public class UpdateJobApplicationEndpoint : IApiEndpoint
 
     internal sealed record UpdateJobApplicationBody
     {
-        public required string Title { get; init; }
         public required string JobTitle { get; init; }
         public string? Description { get; init; }
         public required string CompanyName { get; init; }

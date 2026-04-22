@@ -24,7 +24,6 @@ public class CreateJobApplicationTests
         // Arrange
         var request = new CreateJobApplicationRequest
         {
-            Title = "  Apple iOS Developer  ",
             JobTitle = "Mid iOS Developer",
             CompanyName = "Apple",
             WorkType = 1,
@@ -68,7 +67,6 @@ public class CreateJobApplicationTests
         // Arrange
         var request = new CreateJobApplicationRequest
         {
-            Title = "Title",
             JobTitle = "Job Title",
             CompanyName = "Company",
             WorkType = 1,

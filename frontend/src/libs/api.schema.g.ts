@@ -613,7 +613,6 @@ export interface components {
             userName: string;
         };
         CreateJobApplicationRequest: {
-            title: string;
             jobTitle: string;
             description?: null | string;
             companyName: string;
@@ -665,7 +664,6 @@ export interface components {
         GetJobApplicationByIdDto: {
             /** Format: uuid */
             id: string;
-            title: string;
             jobTitle: string;
             description?: null | string;
             companyName: string;
@@ -733,7 +731,6 @@ export interface components {
         ListJobApplicationsItemDto: {
             /** Format: uuid */
             id: string;
-            title: string;
             jobTitle: string;
             companyName: string;
             /** Format: int32 */
@@ -784,7 +781,6 @@ export interface components {
             password: string;
         };
         UpdateJobApplicationBody: {
-            title: string;
             jobTitle: string;
             description?: null | string;
             companyName: string;

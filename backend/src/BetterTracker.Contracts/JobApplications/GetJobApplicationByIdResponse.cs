@@ -8,7 +8,6 @@ public sealed record GetJobApplicationByIdResponse
 public sealed record GetJobApplicationByIdDto
 {
     public required Guid Id { get; init; }
-    public required string Title { get; init; }
     public required string JobTitle { get; init; }
     public string? Description { get; init; }
     public required string CompanyName { get; init; }

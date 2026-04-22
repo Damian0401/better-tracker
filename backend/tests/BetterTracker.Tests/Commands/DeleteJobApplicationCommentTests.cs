@@ -42,7 +42,6 @@ public class DeleteJobApplicationCommentTests
             {
                 Id = jobApplicationId,
                 UserId = userId,
-                Title = "T",
                 JobTitle = "JT",
                 CompanyName = "C",
                 WorkType = WorkType.Remote,

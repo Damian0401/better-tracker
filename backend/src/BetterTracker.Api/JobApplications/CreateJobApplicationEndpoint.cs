@@ -54,10 +54,6 @@ public class CreateJobApplicationEndpoint : IApiEndpoint
     {
         public Validator()
         {
-            this.RuleFor(x => x.Request.Title)
-                .NotEmpty()
-                .MaximumLength(200);
-
             this.RuleFor(x => x.Request.JobTitle)
                 .NotEmpty()
                 .MaximumLength(200);

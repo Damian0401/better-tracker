@@ -84,7 +84,6 @@ public static class UpdateJobApplication
 
     private static void UpdateJobApplicationFields(JobApplicationEntity jobApplication, UpdateJobApplicationRequest request)
     {
-        jobApplication.Title = request.Title.Trim();
         jobApplication.JobTitle = request.JobTitle.Trim();
         jobApplication.Description = NormalizeNullable(request.Description);
         jobApplication.CompanyName = request.CompanyName.Trim();

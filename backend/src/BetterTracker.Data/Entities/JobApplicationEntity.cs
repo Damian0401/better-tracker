@@ -7,7 +7,6 @@ namespace BetterTracker.Data.Entities;
 public sealed record JobApplicationEntity : BaseEntity<Guid>
 {
     public required Guid UserId { get; set; }
-    public required string Title { get; set; }
     public required string JobTitle { get; set; }
     public string? Description { get; set; }
     public required string CompanyName { get; set; }
@@ -28,7 +27,6 @@ public sealed record JobApplicationEntity : BaseEntity<Guid>
             builder.ToTable("JobApplications", DatabaseSchemas.Default);
             builder.Property(e => e.Id).HasValueGenerator<GuidV7ValueGenerator>();
             builder.Property(e => e.UserId).IsRequired();
-            builder.Property(e => e.Title).HasMaxLength(200).IsRequired();
             builder.Property(e => e.JobTitle).HasMaxLength(200).IsRequired();
             builder.Property(e => e.Description);
             builder.Property(e => e.CompanyName).HasMaxLength(200).IsRequired();

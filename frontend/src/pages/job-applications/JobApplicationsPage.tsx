@@ -27,7 +27,6 @@ const INITIAL_FILTERS: Filters = {
 };
 
 const emptyFormData: UpdateRequest = {
-  title: "",
   jobTitle: "",
   description: "",
   companyName: "",
@@ -43,7 +42,6 @@ const emptyFormData: UpdateRequest = {
 };
 
 const mapDetailsToUpdateRequest = (details: DetailsDto): UpdateRequest => ({
-  title: details.title,
   jobTitle: details.jobTitle,
   description: details.description ?? "",
   companyName: details.companyName,
@@ -328,8 +326,8 @@ export function JobApplicationsPage() {
   });
 
   const handleSave = async () => {
-    if (!formData.title.trim() || !formData.jobTitle.trim() || !formData.companyName.trim()) {
-      toast.error("Title, job title, and company name are required");
+    if (!formData.jobTitle.trim() || !formData.companyName.trim()) {
+      toast.error("Job title and company name are required");
       return;
     }
 
@@ -377,12 +375,11 @@ export function JobApplicationsPage() {
 
       setApplications((prev) =>
         prev.map((item) =>
-          item.id === selectedApplicationId
-            ? {
-                ...item,
-                title: formData.title,
-                jobTitle: formData.jobTitle,
-                companyName: formData.companyName,
+              item.id === selectedApplicationId
+                ? {
+                    ...item,
+                    jobTitle: formData.jobTitle,
+                    companyName: formData.companyName,
                 workType: formData.workType,
                 currentStatus: formData.currentStatus,
                 tags: formData.tags ?? [],

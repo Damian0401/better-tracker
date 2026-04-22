@@ -2,7 +2,6 @@ namespace BetterTracker.Contracts;
 
 public sealed record CreateJobApplicationRequest
 {
-    public required string Title { get; init; }
     public required string JobTitle { get; init; }
     public string? Description { get; init; }
     public required string CompanyName { get; init; }
