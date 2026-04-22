@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Api } from "@/libs/api";
 import type { components } from "@/libs/api.schema.g";
 import { normalizeTextInput } from "@/libs/utils";
@@ -18,6 +18,7 @@ type UpdateRequest = components["schemas"]["UpdateJobApplicationBody"];
 type ListMyTagsItemDto = components["schemas"]["ListMyTagsItemDto"];
 
 const PAGE_SIZE = 10;
+const SEARCH_DEBOUNCE_MS = 500;
 const INITIAL_FILTERS: Filters = {
   search: "",
   status: "",
@@ -71,6 +72,8 @@ export function JobApplicationsPage() {
     jobApplicationStatuses: [],
   });
   const [filters, setFilters] = useState<Filters>(INITIAL_FILTERS);
+  const [searchInput, setSearchInput] = useState(INITIAL_FILTERS.search);
+  const [debouncedSearch, setDebouncedSearch] = useState(INITIAL_FILTERS.search);
   const [skip, setSkip] = useState(0);
   const [total, setTotal] = useState(0);
   const [isListLoading, setIsListLoading] = useState(false);
@@ -79,6 +82,11 @@ export function JobApplicationsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isCommentSubmitting, setIsCommentSubmitting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const listAbortControllerRef = useRef<AbortController | null>(null);
+  const activeFilters: Filters = {
+    ...filters,
+    search: debouncedSearch,
+  };
 
   const isModified = JSON.stringify(formData) !== JSON.stringify(baselineFormData);
 
@@ -103,6 +111,10 @@ export function JobApplicationsPage() {
   };
 
   const fetchApplications = async (skipParam: number, shouldAppend: boolean, activeFilters: Filters) => {
+    listAbortControllerRef.current?.abort();
+    const nextAbortController = new AbortController();
+    listAbortControllerRef.current = nextAbortController;
+
     const query: {
       Count: number;
       Skip: number;
@@ -128,11 +140,23 @@ export function JobApplicationsPage() {
       query.Search = activeFilters.search.trim();
     }
 
-    const response = await Api.GET("/api/v1/job-applications", {
-      params: {
-        query,
-      },
-    });
+    let response;
+
+    try {
+      response = await Api.GET("/api/v1/job-applications", {
+        params: {
+          query,
+        },
+        signal: nextAbortController.signal,
+      });
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+
+      toast.error("Failed to load job applications");
+      return;
+    }
 
     if (!response.data) {
       toast.error("Failed to load job applications");
@@ -177,25 +201,37 @@ export function JobApplicationsPage() {
 
   useEffect(() => {
     const loadInitialData = async () => {
-      await fetchDropdowns();
-      await fetchTags();
-      setIsListLoading(true);
-      await fetchApplications(0, false, INITIAL_FILTERS);
-      setIsListLoading(false);
+      await Promise.all([fetchDropdowns(), fetchTags()]);
     };
 
     void loadInitialData();
   }, []);
 
   useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedSearch(searchInput);
+    }, SEARCH_DEBOUNCE_MS);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [searchInput]);
+
+  useEffect(() => {
     const loadFilteredList = async () => {
       setIsListLoading(true);
-      await fetchApplications(0, false, filters);
+      await fetchApplications(0, false, activeFilters);
       setIsListLoading(false);
     };
 
     void loadFilteredList();
-  }, [filters]);
+  }, [debouncedSearch, filters]);
+
+  useEffect(() => {
+    return () => {
+      listAbortControllerRef.current?.abort();
+    };
+  }, []);
 
   const handleSelect = async (id: string) => {
     setIsCreating(false);
@@ -225,7 +261,7 @@ export function JobApplicationsPage() {
 
   const handleLoadMore = async () => {
     setIsLoadingMore(true);
-    await fetchApplications(skip, true, filters);
+    await fetchApplications(skip, true, activeFilters);
     setIsLoadingMore(false);
   };
 
@@ -314,7 +350,7 @@ export function JobApplicationsPage() {
 
         toast.success("Job application created");
         setIsListLoading(true);
-        await fetchApplications(0, false, filters);
+        await fetchApplications(0, false, activeFilters);
         setIsListLoading(false);
 
         resetDetails();
@@ -451,14 +487,17 @@ export function JobApplicationsPage() {
           <JobApplicationsListPanel
             applications={applications}
             selectedApplicationId={selectedApplicationId}
-            filters={filters}
+            filters={{
+              ...filters,
+              search: searchInput,
+            }}
             dropdowns={dropdowns}
             availableTags={availableTags}
             total={total}
             isListLoading={isListLoading}
             isLoadingMore={isLoadingMore}
             onCreate={handleCreate}
-            onSearchChange={(value) => setFilters((prev) => ({ ...prev, search: value }))}
+            onSearchChange={setSearchInput}
             onStatusChange={(value) => setFilters((prev) => ({ ...prev, status: value }))}
             onWorkTypeChange={(value) => setFilters((prev) => ({ ...prev, workType: value }))}
             onTagChange={(value) => setFilters((prev) => ({ ...prev, tag: value }))}
