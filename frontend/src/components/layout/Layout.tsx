@@ -2,6 +2,7 @@ import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { cn } from "@/libs/utils/cn";
 import { Auth } from "@/libs/auth";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Routes } from "@/constants";
 
 interface LayoutProps {
@@ -55,10 +56,13 @@ export function Layout({ children }: LayoutProps) {
 
       {/* Main Content */}
       <main className="flex flex-col flex-1 overflow-hidden">
-        <div className="flex shrink-0 items-center justify-end gap-4 p-4">
+        <div className="flex shrink-0 items-center justify-end gap-3 p-4">
           {isAuthenticated && user && (
-            <span className="text-sm text-muted-foreground">{user.userName}</span>
+            <div className="rounded-md border bg-card px-3 py-1.5 text-sm font-medium text-foreground shadow-sm">
+              {user.userName}
+            </div>
           )}
+          <ThemeToggle />
           {isAuthenticated && (
             <Button variant="outline" onClick={handleLogout}>
               Logout
