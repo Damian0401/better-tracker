@@ -32,9 +32,9 @@ public class ListJobApplicationsEndpoint : IApiEndpoint
         var response = await ListJobApplications.HandleAsync(
             parameters.Count,
             parameters.Skip,
-            parameters.Status,
-            parameters.Tag,
-            parameters.WorkType,
+            parameters.Statuses,
+            parameters.Tags,
+            parameters.WorkTypes,
             parameters.Search,
             userIdResult.Data,
             services.DbContext,
@@ -52,13 +52,13 @@ public class ListJobApplicationsEndpoint : IApiEndpoint
         public int? Skip { get; init; }
 
         [FromQuery]
-        public int? Status { get; init; }
+        public int[]? Statuses { get; init; }
 
         [FromQuery]
-        public string? Tag { get; init; }
+        public string[]? Tags { get; init; }
 
         [FromQuery]
-        public int? WorkType { get; init; }
+        public int[]? WorkTypes { get; init; }
 
         [FromQuery]
         public string? Search { get; init; }

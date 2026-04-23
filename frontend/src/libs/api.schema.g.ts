@@ -258,9 +258,9 @@ export interface paths {
                 query?: {
                     Count?: number | string;
                     Skip?: number | string;
-                    Status?: number | string;
-                    Tag?: string;
-                    WorkType?: number | string;
+                    Statuses?: (number | string)[];
+                    Tags?: string[];
+                    WorkTypes?: (number | string)[];
                     Search?: string;
                 };
                 header?: never;

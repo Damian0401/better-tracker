@@ -19,9 +19,9 @@ interface JobApplicationsListPanelProps {
   isLoadingMore: boolean;
   onCreate: () => void;
   onSearchChange: (value: string) => void;
-  onStatusChange: (value: string) => void;
-  onWorkTypeChange: (value: string) => void;
-  onTagChange: (value: string) => void;
+  onStatusToggle: (value: string, checked: boolean) => void;
+  onWorkTypeToggle: (value: string, checked: boolean) => void;
+  onTagToggle: (value: string, checked: boolean) => void;
   onSelect: (id: string) => void;
   onLoadMore: () => void;
 }
@@ -37,9 +37,9 @@ export function JobApplicationsListPanel({
   isLoadingMore,
   onCreate,
   onSearchChange,
-  onStatusChange,
-  onWorkTypeChange,
-  onTagChange,
+  onStatusToggle,
+  onWorkTypeToggle,
+  onTagToggle,
   onSelect,
   onLoadMore,
 }: JobApplicationsListPanelProps) {
@@ -56,45 +56,74 @@ export function JobApplicationsListPanel({
           onChange={(event) => onSearchChange(event.target.value)}
         />
 
-        <div className="flex flex-wrap items-center gap-2">
-          <select
-            className="h-9 min-w-40 flex-1 basis-56 rounded-md border bg-background px-3 text-sm"
-            value={filters.status}
-            onChange={(event) => onStatusChange(event.target.value)}
-          >
-            <option value="">All statuses</option>
-            {dropdowns.jobApplicationStatuses.map((option) => (
-              <option key={option.value.toString()} value={option.value.toString()}>
-                {option.name}
-              </option>
-            ))}
-          </select>
+        <div className="space-y-2">
+          <details className="rounded-md border p-2">
+            <summary className="cursor-pointer text-sm font-medium">
+              Statuses {filters.statuses.length > 0 ? `(${filters.statuses.length})` : ""}
+            </summary>
+            <div className="mt-2 space-y-1">
+              {dropdowns.jobApplicationStatuses.map((option) => {
+                const value = option.value.toString();
+                const isChecked = filters.statuses.includes(value);
 
-          <select
-            className="h-9 min-w-40 flex-1 basis-56 rounded-md border bg-background px-3 text-sm"
-            value={filters.workType}
-            onChange={(event) => onWorkTypeChange(event.target.value)}
-          >
-            <option value="">All work types</option>
-            {dropdowns.workTypes.map((option) => (
-              <option key={option.value.toString()} value={option.value.toString()}>
-                {option.name}
-              </option>
-            ))}
-          </select>
+                return (
+                  <label key={value} className="flex cursor-pointer items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={(event) => onStatusToggle(value, event.target.checked)}
+                    />
+                    <span>{option.name}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </details>
 
-          <select
-            className="h-9 min-w-40 flex-1 basis-56 rounded-md border bg-background px-3 text-sm"
-            value={filters.tag}
-            onChange={(event) => onTagChange(event.target.value)}
-          >
-            <option value="">All tags</option>
-            {availableTags.map((tag) => (
-              <option key={tag.id} value={tag.name}>
-                #{tag.name}
-              </option>
-            ))}
-          </select>
+          <details className="rounded-md border p-2">
+            <summary className="cursor-pointer text-sm font-medium">
+              Work Types {filters.workTypes.length > 0 ? `(${filters.workTypes.length})` : ""}
+            </summary>
+            <div className="mt-2 space-y-1">
+              {dropdowns.workTypes.map((option) => {
+                const value = option.value.toString();
+                const isChecked = filters.workTypes.includes(value);
+
+                return (
+                  <label key={value} className="flex cursor-pointer items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={(event) => onWorkTypeToggle(value, event.target.checked)}
+                    />
+                    <span>{option.name}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </details>
+
+          <details className="rounded-md border p-2">
+            <summary className="cursor-pointer text-sm font-medium">
+              Tags {filters.tags.length > 0 ? `(${filters.tags.length})` : ""}
+            </summary>
+            <div className="mt-2 space-y-1">
+              {availableTags.map((tag) => {
+                const isChecked = filters.tags.includes(tag.name);
+
+                return (
+                  <label key={tag.id} className="flex cursor-pointer items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={(event) => onTagToggle(tag.name, event.target.checked)}
+                    />
+                    <span>#{tag.name}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </details>
         </div>
       </div>
 

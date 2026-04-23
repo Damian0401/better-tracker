@@ -12,9 +12,9 @@ public static class ListJobApplications
     public static async ValueTask<ListJobApplicationsResponse> HandleAsync(
         int? count,
         int? skip,
-        int? status,
-        string? tag,
-        int? workType,
+        IReadOnlyList<int>? statuses,
+        IReadOnlyList<string>? tags,
+        IReadOnlyList<int>? workTypes,
         string? search,
         Guid userId,
         AppDbContext dbContext,
@@ -27,16 +27,26 @@ public static class ListJobApplications
             .Where(x => x.UserId == userId)
             .AsQueryable();
 
-        if (status.HasValue && Enum.IsDefined((JobApplicationStatus)status.Value))
+        var parsedStatuses = statuses?
+            .Where(x => Enum.IsDefined((JobApplicationStatus)x))
+            .Select(x => (JobApplicationStatus)x)
+            .Distinct()
+            .ToList();
+
+        if (parsedStatuses is { Count: > 0 })
         {
-            var parsedStatus = (JobApplicationStatus)status.Value;
-            query = query.Where(x => x.CurrentStatus == parsedStatus);
+            query = query.Where(x => parsedStatuses.Contains(x.CurrentStatus));
         }
 
-        if (workType.HasValue && Enum.IsDefined((WorkType)workType.Value))
+        var parsedWorkTypes = workTypes?
+            .Where(x => Enum.IsDefined((WorkType)x))
+            .Select(x => (WorkType)x)
+            .Distinct()
+            .ToList();
+
+        if (parsedWorkTypes is { Count: > 0 })
         {
-            var parsedWorkType = (WorkType)workType.Value;
-            query = query.Where(x => x.WorkType == parsedWorkType);
+            query = query.Where(x => parsedWorkTypes.Contains(x.WorkType));
         }
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -47,9 +57,14 @@ public static class ListJobApplications
                 x.CompanyName.Contains(normalizedSearch));
         }
 
-        if (!string.IsNullOrWhiteSpace(tag))
+        var normalizedTags = tags?
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Select(x => x.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (normalizedTags is { Count: > 0 })
         {
-            var normalizedTag = tag.Trim();
             query = query.Where(x => dbContext.JobApplicationTags
                 .Where(y => y.JobApplicationId == x.Id)
                 .Join(
@@ -57,7 +72,7 @@ public static class ListJobApplications
                     y => y.TagId,
                     t => t.Id,
                     (_, t) => t.Name)
-                .Any(t => t == normalizedTag));
+                .Any(t => normalizedTags.Contains(t)));
         }
 
         var total = await query.CountAsync(cancellationToken);

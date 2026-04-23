@@ -22,9 +22,9 @@ const PAGE_SIZE = 10;
 const SEARCH_DEBOUNCE_MS = 500;
 const INITIAL_FILTERS: Filters = {
   search: "",
-  status: "",
-  workType: "",
-  tag: "",
+  statuses: [],
+  workTypes: [],
+  tags: [],
 };
 
 const emptyFormData: UpdateRequest = {
@@ -90,6 +90,14 @@ export function JobApplicationsPage() {
 
   const isModified = JSON.stringify(formData) !== JSON.stringify(baselineFormData);
 
+  const toggleFilterValue = (values: string[], value: string, checked: boolean) => {
+    if (checked) {
+      return values.includes(value) ? values : [...values, value];
+    }
+
+    return values.filter((item) => item !== value);
+  };
+
   const fetchDropdowns = async () => {
     const response = await Api.GET("/api/v1/job-applications/dropdowns");
     if (!response.data) {
@@ -118,23 +126,23 @@ export function JobApplicationsPage() {
     const query: {
       Count: number;
       Skip: number;
-      Status?: number | string;
-      WorkType?: number | string;
-      Tag?: string;
+      Statuses?: (number | string)[];
+      WorkTypes?: (number | string)[];
+      Tags?: string[];
       Search?: string;
     } = {
       Count: PAGE_SIZE,
       Skip: skipParam,
     };
 
-    if (activeFilters.status) {
-      query.Status = activeFilters.status;
+    if (activeFilters.statuses.length > 0) {
+      query.Statuses = activeFilters.statuses;
     }
-    if (activeFilters.workType) {
-      query.WorkType = activeFilters.workType;
+    if (activeFilters.workTypes.length > 0) {
+      query.WorkTypes = activeFilters.workTypes;
     }
-    if (activeFilters.tag) {
-      query.Tag = activeFilters.tag;
+    if (activeFilters.tags.length > 0) {
+      query.Tags = activeFilters.tags;
     }
     if (activeFilters.search.trim()) {
       query.Search = activeFilters.search.trim();
@@ -500,9 +508,24 @@ export function JobApplicationsPage() {
             isLoadingMore={isLoadingMore}
             onCreate={handleCreate}
             onSearchChange={setSearchInput}
-            onStatusChange={(value) => setFilters((prev) => ({ ...prev, status: value }))}
-            onWorkTypeChange={(value) => setFilters((prev) => ({ ...prev, workType: value }))}
-            onTagChange={(value) => setFilters((prev) => ({ ...prev, tag: value }))}
+            onStatusToggle={(value, checked) =>
+              setFilters((prev) => ({
+                ...prev,
+                statuses: toggleFilterValue(prev.statuses, value, checked),
+              }))
+            }
+            onWorkTypeToggle={(value, checked) =>
+              setFilters((prev) => ({
+                ...prev,
+                workTypes: toggleFilterValue(prev.workTypes, value, checked),
+              }))
+            }
+            onTagToggle={(value, checked) =>
+              setFilters((prev) => ({
+                ...prev,
+                tags: toggleFilterValue(prev.tags, value, checked),
+              }))
+            }
             onSelect={(id) => void handleSelect(id)}
             onLoadMore={() => void handleLoadMore()}
           />
