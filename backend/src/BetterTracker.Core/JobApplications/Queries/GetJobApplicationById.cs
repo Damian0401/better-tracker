@@ -27,6 +27,7 @@ public static class GetJobApplicationById
                 Experience = x.Experience,
                 WorkType = (int)x.WorkType,
                 CurrentStatus = (int)x.CurrentStatus,
+                IsArchived = x.IsArchived,
                 CreatedAt = x.CreatedAt,
                 UpdatedAt = x.UpdatedAt,
                 Tags = new List<string>(),

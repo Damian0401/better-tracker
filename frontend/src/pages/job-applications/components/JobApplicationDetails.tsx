@@ -2,6 +2,7 @@ import { useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import type { components } from "@/libs/api.schema.g";
 import { getTagColorClass } from "@/libs/utils";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -30,12 +31,15 @@ interface JobApplicationDetailsProps {
   comments: CommentDto[];
   statusHistory: StatusHistoryDto[];
   isCommentSubmitting: boolean;
+  isReadOnly?: boolean;
   onClose: () => void;
   onFormChange: (field: keyof UpdateRequest, value: UpdateRequest[keyof UpdateRequest]) => void;
   onAddTag: (tag: string) => boolean;
   onToggleTag: (tag: string) => void;
   onSave: () => void;
   onDelete: () => void;
+  onArchive?: () => void;
+  onUnarchive?: () => void;
   onAddComment: (content: string) => Promise<boolean>;
   onDeleteComment: (id: string) => void;
 }
@@ -51,12 +55,15 @@ export function JobApplicationDetails({
   comments,
   statusHistory,
   isCommentSubmitting,
+  isReadOnly = false,
   onClose,
   onFormChange,
   onAddTag,
   onToggleTag,
   onSave,
   onDelete,
+  onArchive,
+  onUnarchive,
   onAddComment,
   onDeleteComment,
 }: JobApplicationDetailsProps) {
@@ -64,6 +71,8 @@ export function JobApplicationDetails({
   const [newComment, setNewComment] = useState("");
   const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
   const [isStatusHistoryOpen, setIsStatusHistoryOpen] = useState(false);
+  const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false);
+  const [isUnarchiveDialogOpen, setIsUnarchiveDialogOpen] = useState(false);
   const selectedTags = formData.tags ?? [];
   const normalizedTagInput = tagInput.trim().toLowerCase();
   const sortedStatusHistory = [...statusHistory].sort(
@@ -147,7 +156,7 @@ export function JobApplicationDetails({
     <div className="h-full overflow-y-auto p-6">
       <Card className="border-0 shadow-none">
         <CardHeader className="relative">
-          <CardTitle>{isCreating ? "Create Job Application" : "Edit Job Application"}</CardTitle>
+          <CardTitle>{isCreating ? "Create Job Application" : isReadOnly ? "Job Application Details" : "Edit Job Application"}</CardTitle>
           <Button variant="ghost" size="icon" className="absolute right-4 top-4" onClick={onClose}>
             <span className="text-xl">x</span>
           </Button>
@@ -162,6 +171,7 @@ export function JobApplicationDetails({
               <FormField label="Job Title" className="md:col-span-2">
                 <Input
                   value={formData.jobTitle}
+                  disabled={isReadOnly}
                   onChange={(event) => onFormChange("jobTitle", event.target.value)}
                   placeholder="Position title"
                 />
@@ -169,6 +179,7 @@ export function JobApplicationDetails({
               <FormField label="Company">
                 <Input
                   value={formData.companyName}
+                  disabled={isReadOnly}
                   onChange={(event) => onFormChange("companyName", event.target.value)}
                   placeholder="Company name"
                 />
@@ -176,6 +187,7 @@ export function JobApplicationDetails({
               <FormField label="Link">
                 <Input
                   value={formData.link ?? ""}
+                  disabled={isReadOnly}
                   onChange={(event) => onFormChange("link", event.target.value)}
                   placeholder="https://..."
                 />
@@ -204,6 +216,7 @@ export function JobApplicationDetails({
                 <select
                   className="h-9 w-full rounded-md border bg-background px-3 text-sm"
                   value={formData.currentStatus.toString()}
+                  disabled={isReadOnly}
                   onChange={(event) => onFormChange("currentStatus", event.target.value)}
                 >
                   {dropdowns.jobApplicationStatuses.map((option) => (
@@ -217,6 +230,7 @@ export function JobApplicationDetails({
                 <select
                   className="h-9 w-full rounded-md border bg-background px-3 text-sm"
                   value={formData.workType.toString()}
+                  disabled={isReadOnly}
                   onChange={(event) => onFormChange("workType", event.target.value)}
                 >
                   {dropdowns.workTypes.map((option) => (
@@ -231,6 +245,7 @@ export function JobApplicationDetails({
             <FormField label="Technologies">
               <Input
                 value={formData.technologies ?? ""}
+                disabled={isReadOnly}
                 onChange={(event) => onFormChange("technologies", event.target.value)}
                 placeholder="React, TypeScript, .NET"
               />
@@ -239,6 +254,7 @@ export function JobApplicationDetails({
             <FormField label="Experience">
               <Input
                 value={formData.experience ?? ""}
+                disabled={isReadOnly}
                 onChange={(event) => onFormChange("experience", event.target.value)}
                 placeholder="Mid / Senior / 3+ years"
               />
@@ -247,6 +263,7 @@ export function JobApplicationDetails({
             <FormField label="Description">
               <Textarea
                 value={formData.description ?? ""}
+                disabled={isReadOnly}
                 onChange={(event) => onFormChange("description", event.target.value)}
                 rows={4}
               />
@@ -255,6 +272,7 @@ export function JobApplicationDetails({
             <FormField label="Requirements">
               <Textarea
                 value={formData.requirements ?? ""}
+                disabled={isReadOnly}
                 onChange={(event) => onFormChange("requirements", event.target.value)}
                 rows={4}
               />
@@ -263,6 +281,7 @@ export function JobApplicationDetails({
             <FormField label="Benefits">
               <Textarea
                 value={formData.benefits ?? ""}
+                disabled={isReadOnly}
                 onChange={(event) => onFormChange("benefits", event.target.value)}
                 rows={4}
               />
@@ -281,6 +300,7 @@ export function JobApplicationDetails({
                       key={salary.salaryType.toString()}
                       salary={salary}
                       salaryLabel={salaryLabel}
+                      isReadOnly={isReadOnly}
                       onAmountChange={updateSalary}
                       onCurrencyChange={handleCurrencyChange}
                     />
@@ -290,75 +310,86 @@ export function JobApplicationDetails({
             </FormField>
 
             <FormField label="Tags">
-              <div className="relative flex gap-2">
-                <Input
-                  value={tagInput}
-                  onChange={(event) => setTagInput(event.target.value)}
-                  placeholder="Type to add or select tag"
-                  onFocus={() => setIsTagDropdownOpen(true)}
-                  onBlur={() => {
-                    window.setTimeout(() => {
-                      setIsTagDropdownOpen(false);
-                    }, 100);
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      event.preventDefault();
-                      handleAddTag();
-                    }
-                  }}
-                />
-                <Button type="button" variant="outline" onClick={handleAddTag}>
-                  Add
-                </Button>
+              {!isReadOnly ? (
+                <div className="relative flex gap-2">
+                  <Input
+                    value={tagInput}
+                    onChange={(event) => setTagInput(event.target.value)}
+                    placeholder="Type to add or select tag"
+                    onFocus={() => setIsTagDropdownOpen(true)}
+                    onBlur={() => {
+                      window.setTimeout(() => {
+                        setIsTagDropdownOpen(false);
+                      }, 100);
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        handleAddTag();
+                      }
+                    }}
+                  />
+                  <Button type="button" variant="outline" onClick={handleAddTag}>
+                    Add
+                  </Button>
 
-                {isTagDropdownOpen ? (
-                  <div
-                    className="absolute left-0 right-20 top-11 z-10 max-h-48 overflow-y-auto rounded-md border p-1 text-popover-foreground shadow-lg"
-                    style={{ backgroundColor: "hsl(var(--popover))", opacity: 1 }}
-                  >
-                    {filteredAvailableTags.length === 0 ? (
-                      <div className="px-2 py-1 text-xs text-muted-foreground">No matching tags</div>
-                    ) : (
-                      filteredAvailableTags.map((tag) => {
-                        const isSelected = selectedTags.includes(tag.name);
+                  {isTagDropdownOpen ? (
+                    <div
+                      className="absolute left-0 right-20 top-11 z-10 max-h-48 overflow-y-auto rounded-md border p-1 text-popover-foreground shadow-lg"
+                      style={{ backgroundColor: "hsl(var(--popover))", opacity: 1 }}
+                    >
+                      {filteredAvailableTags.length === 0 ? (
+                        <div className="px-2 py-1 text-xs text-muted-foreground">No matching tags</div>
+                      ) : (
+                        filteredAvailableTags.map((tag) => {
+                          const isSelected = selectedTags.includes(tag.name);
 
-                        return (
-                          <button
-                            key={tag.id}
-                            type="button"
-                            onMouseDown={(event) => {
-                              event.preventDefault();
-                              onToggleTag(tag.name);
-                            }}
-                            className={`flex w-full items-center justify-between rounded px-2 py-1 text-left text-sm transition-colors hover:bg-muted ${
-                              isSelected ? "bg-muted" : ""
-                            }`}
-                          >
-                            <span>#{tag.name}</span>
-                            {isSelected ? <span className="text-xs text-muted-foreground">Selected</span> : null}
-                          </button>
-                        );
-                      })
-                    )}
-                  </div>
-                ) : null}
-              </div>
+                          return (
+                            <button
+                              key={tag.id}
+                              type="button"
+                              onMouseDown={(event) => {
+                                event.preventDefault();
+                                onToggleTag(tag.name);
+                              }}
+                              className={`flex w-full items-center justify-between rounded px-2 py-1 text-left text-sm transition-colors hover:bg-muted ${
+                                isSelected ? "bg-muted" : ""
+                              }`}
+                            >
+                              <span>#{tag.name}</span>
+                              {isSelected ? <span className="text-xs text-muted-foreground">Selected</span> : null}
+                            </button>
+                          );
+                        })
+                      )}
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
 
               <div className="flex flex-wrap gap-2">
                 {selectedTags.length === 0 ? (
                   <div className="text-xs text-muted-foreground">No tags selected</div>
                 ) : (
-                  selectedTags.map((tag) => (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => onToggleTag(tag)}
-                      className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition-opacity hover:opacity-80 ${getTagColorClass(tag)}`}
-                    >
-                      #{tag}
-                    </button>
-                  ))
+                  selectedTags.map((tag) =>
+                    isReadOnly ? (
+                      <span
+                        key={tag}
+                        className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium ${getTagColorClass(tag)}`}
+                      >
+                        #{tag}
+                      </span>
+                    ) : (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => onToggleTag(tag)}
+                        className={`inline-flex h-8 items-center rounded-full border px-3 text-xs font-medium transition-opacity hover:opacity-80 ${getTagColorClass(tag)}`}
+                      >
+                        #{tag}
+                      </button>
+                    ),
+                  )
                 )}
               </div>
             </FormField>
@@ -366,17 +397,38 @@ export function JobApplicationDetails({
             <Separator />
 
             <div className="flex gap-2">
-              <Button onClick={onSave} disabled={isSaving || (!isCreating && !isModified)}>
-                {isSaving ? "Saving..." : "Save"}
-              </Button>
               {isCreating ? (
-                <Button variant="outline" onClick={onClose} disabled={isSaving}>
-                  Cancel
-                </Button>
+                <>
+                  <Button onClick={onSave} disabled={isSaving}>
+                    {isSaving ? "Saving..." : "Save"}
+                  </Button>
+                  <Button variant="outline" onClick={onClose} disabled={isSaving}>
+                    Cancel
+                  </Button>
+                </>
               ) : (
-                <Button variant="destructive" onClick={onDelete} disabled={isSaving}>
-                  Delete
-                </Button>
+                <>
+                  {!isReadOnly ? (
+                    <Button onClick={onSave} disabled={isSaving || !isModified}>
+                      {isSaving ? "Saving..." : "Save"}
+                    </Button>
+                  ) : null}
+                  {!isReadOnly ? (
+                    <Button variant="destructive" onClick={onDelete} disabled={isSaving}>
+                      Delete
+                    </Button>
+                  ) : null}
+                  {onArchive ? (
+                    <Button variant="secondary" onClick={() => setIsArchiveDialogOpen(true)} disabled={isSaving}>
+                      Archive
+                    </Button>
+                  ) : null}
+                  {onUnarchive ? (
+                    <Button variant="secondary" onClick={() => setIsUnarchiveDialogOpen(true)} disabled={isSaving}>
+                      Unarchive
+                    </Button>
+                  ) : null}
+                </>
               )}
             </div>
 
@@ -387,6 +439,7 @@ export function JobApplicationDetails({
                 comments={comments}
                 newComment={newComment}
                 isCommentSubmitting={isCommentSubmitting}
+                isReadOnly={isReadOnly}
                 onNewCommentChange={setNewComment}
                 onAddComment={() => void handleAddComment()}
                 onDeleteComment={onDeleteComment}
@@ -438,6 +491,26 @@ export function JobApplicationDetails({
           </DialogPrimitive.Content>
         </DialogPrimitive.Portal>
       </DialogPrimitive.Root>
+
+      <ConfirmDialog
+        open={isArchiveDialogOpen}
+        onOpenChange={setIsArchiveDialogOpen}
+        onConfirm={() => onArchive?.()}
+        title="Archive Job Application"
+        description="Are you sure you want to archive this job application? You can restore it later from Archive."
+        confirmText="Archive"
+        cancelText="Cancel"
+      />
+
+      <ConfirmDialog
+        open={isUnarchiveDialogOpen}
+        onOpenChange={setIsUnarchiveDialogOpen}
+        onConfirm={() => onUnarchive?.()}
+        title="Unarchive Job Application"
+        description="Are you sure you want to unarchive this job application? It will appear in active applications again."
+        confirmText="Unarchive"
+        cancelText="Cancel"
+      />
     </div>
   );
 }

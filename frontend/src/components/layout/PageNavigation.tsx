@@ -5,6 +5,7 @@ import { cn } from "@/libs/utils/cn";
 const navItems = [
   { path: Routes.HOME, label: "Home" },
   { path: Routes.JOB_APPLICATIONS, label: "Applications" },
+  { path: Routes.ARCHIVE, label: "Archive" },
   { path: Routes.NOTES, label: "Notes" },
 ];
 

@@ -1,13 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { ListWithSideSheetLayout } from "@/components/layout/ListWithSideSheetLayout";
 import { Api } from "@/libs/api";
 import type { components } from "@/libs/api.schema.g";
 import { normalizeTextInput } from "@/libs/utils";
-import { ConfirmDialog } from "@/components/ConfirmDialog";
-import { ListWithSideSheetLayout } from "@/components/layout/ListWithSideSheetLayout";
 import { JobApplicationDetails } from "./components/JobApplicationDetails";
 import { JobApplicationsListPanel } from "./components/JobApplicationsListPanel";
-import type { Filters } from "./components/types";
-import { toast } from "sonner";
+import {
+  JOB_APPLICATION_LIST_STATES,
+  type Filters,
+  type JobApplicationListState,
+} from "./components/types";
 
 type DropdownsResponse = components["schemas"]["GetJobApplicationDropdownsResponse"];
 type ListItem = components["schemas"]["ListJobApplicationsItemDto"];
@@ -19,6 +23,12 @@ type UpdateRequest = components["schemas"]["UpdateJobApplicationBody"];
 type ListMyTagsItemDto = components["schemas"]["ListMyTagsItemDto"];
 type SalaryTypeOption = components["schemas"]["GetJobApplicationDropdownOption"];
 type UpdateSalaryDto = components["schemas"]["UpdateJobApplicationSalaryDto"];
+
+type JobApplicationsPageMode = "applications" | "archive";
+
+interface JobApplicationsPageProps {
+  mode?: JobApplicationsPageMode;
+}
 
 const PAGE_SIZE = 10;
 const SEARCH_DEBOUNCE_MS = 500;
@@ -92,9 +102,12 @@ const mapDetailsToUpdateRequest = (details: DetailsDto): UpdateRequest => ({
   tags: details.tags,
 });
 
-export function JobApplicationsPage() {
+export function JobApplicationsPage({ mode = "applications" }: JobApplicationsPageProps) {
+  const isArchivePage = mode === "archive";
+  const isReadOnly = isArchivePage;
   const [applications, setApplications] = useState<ListItem[]>([]);
   const [selectedApplicationId, setSelectedApplicationId] = useState<string | null>(null);
+  const [selectedApplicationIsArchived, setSelectedApplicationIsArchived] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState<UpdateRequest>(emptyFormData);
   const [baselineFormData, setBaselineFormData] = useState<UpdateRequest>(emptyFormData);
@@ -118,10 +131,18 @@ export function JobApplicationsPage() {
   const [isCommentSubmitting, setIsCommentSubmitting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const listAbortControllerRef = useRef<AbortController | null>(null);
-  const activeFilters: Filters = {
-    ...filters,
-    search: debouncedSearch,
-  };
+
+  const listState: JobApplicationListState = isArchivePage
+    ? JOB_APPLICATION_LIST_STATES.ARCHIVED
+    : JOB_APPLICATION_LIST_STATES.ACTIVE;
+
+  const activeFilters = useMemo<Filters>(
+    () => ({
+      ...filters,
+      search: debouncedSearch,
+    }),
+    [debouncedSearch, filters],
+  );
 
   const isModified = JSON.stringify(formData) !== JSON.stringify(baselineFormData);
 
@@ -161,63 +182,68 @@ export function JobApplicationsPage() {
     setAvailableTags(response.data.items);
   };
 
-  const fetchApplications = async (skipParam: number, shouldAppend: boolean, activeFilters: Filters) => {
-    listAbortControllerRef.current?.abort();
-    const nextAbortController = new AbortController();
-    listAbortControllerRef.current = nextAbortController;
+  const fetchApplications = useCallback(
+    async (skipParam: number, shouldAppend: boolean, activeFilters: Filters) => {
+      listAbortControllerRef.current?.abort();
+      const nextAbortController = new AbortController();
+      listAbortControllerRef.current = nextAbortController;
 
-    const query: {
-      Count: number;
-      Skip: number;
-      Statuses?: (number | string)[];
-      WorkTypes?: (number | string)[];
-      Tags?: string[];
-      Search?: string;
-    } = {
-      Count: PAGE_SIZE,
-      Skip: skipParam,
-    };
+      const query: {
+        Count: number;
+        Skip: number;
+        Statuses?: (number | string)[];
+        WorkTypes?: (number | string)[];
+        Tags?: string[];
+        Search?: string;
+        State?: JobApplicationListState;
+      } = {
+        Count: PAGE_SIZE,
+        Skip: skipParam,
+        State: listState,
+      };
 
-    if (activeFilters.statuses.length > 0) {
-      query.Statuses = activeFilters.statuses;
-    }
-    if (activeFilters.workTypes.length > 0) {
-      query.WorkTypes = activeFilters.workTypes;
-    }
-    if (activeFilters.tags.length > 0) {
-      query.Tags = activeFilters.tags;
-    }
-    if (activeFilters.search.trim()) {
-      query.Search = activeFilters.search.trim();
-    }
+      if (activeFilters.statuses.length > 0) {
+        query.Statuses = activeFilters.statuses;
+      }
+      if (activeFilters.workTypes.length > 0) {
+        query.WorkTypes = activeFilters.workTypes;
+      }
+      if (activeFilters.tags.length > 0) {
+        query.Tags = activeFilters.tags;
+      }
+      if (activeFilters.search.trim()) {
+        query.Search = activeFilters.search.trim();
+      }
 
-    let response;
+      let response;
 
-    try {
-      response = await Api.GET("/api/v1/job-applications", {
-        params: {
-          query,
-        },
-        signal: nextAbortController.signal,
-      });
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") {
+      try {
+        response = await Api.GET("/api/v1/job-applications", {
+          params: {
+            query,
+          },
+          signal: nextAbortController.signal,
+        });
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+
+        toast.error("Failed to load job applications");
         return;
       }
 
-      toast.error("Failed to load job applications");
-      return;
-    }
+      if (!response.data) {
+        toast.error("Failed to load job applications");
+        return;
+      }
 
-    if (!response.data) {
-      toast.error("Failed to load job applications");
-      return;
-    }
-
-    setTotal(Number(response.data.total));
-    setSkip(skipParam + response.data.items.length);
-    setApplications((prev) => (shouldAppend ? [...prev, ...response.data.items] : response.data.items));
-  };
+      setTotal(Number(response.data.total));
+      setSkip(skipParam + response.data.items.length);
+      setApplications((prev) => (shouldAppend ? [...prev, ...response.data.items] : response.data.items));
+    },
+    [listState],
+  );
 
   const fetchApplicationDetails = async (id: string) => {
     setIsDetailsLoading(true);
@@ -240,6 +266,7 @@ export function JobApplicationsPage() {
       };
       setFormData(mappedWithSalaries);
       setBaselineFormData(mappedWithSalaries);
+      setSelectedApplicationIsArchived(details.isArchived);
       setComments(details.comments);
       setStatusHistory(details.statusHistory);
     } finally {
@@ -249,6 +276,7 @@ export function JobApplicationsPage() {
 
   const resetDetails = () => {
     setSelectedApplicationId(null);
+    setSelectedApplicationIsArchived(false);
     setIsCreating(false);
     setFormData(emptyFormData);
     setBaselineFormData(emptyFormData);
@@ -282,7 +310,7 @@ export function JobApplicationsPage() {
     };
 
     void loadFilteredList();
-  }, [debouncedSearch, filters]);
+  }, [activeFilters, fetchApplications]);
 
   useEffect(() => {
     return () => {
@@ -297,6 +325,10 @@ export function JobApplicationsPage() {
   };
 
   const handleCreate = () => {
+    if (isReadOnly) {
+      return;
+    }
+
     resetDetails();
     setIsCreating(true);
 
@@ -386,6 +418,10 @@ export function JobApplicationsPage() {
   });
 
   const handleSave = async () => {
+    if (isReadOnly) {
+      return;
+    }
+
     if (!formData.jobTitle.trim() || !formData.companyName.trim()) {
       toast.error("Job title and company name are required");
       return;
@@ -436,17 +472,17 @@ export function JobApplicationsPage() {
       setApplications((prev) =>
         prev.map((item) =>
               item.id === selectedApplicationId
-                ? {
-                    ...item,
-                    jobTitle: formData.jobTitle,
-                    companyName: formData.companyName,
-                workType: formData.workType,
-                currentStatus: formData.currentStatus,
-                tags: formData.tags ?? [],
-                }
-            : item
-        )
-      );
+                  ? {
+                      ...item,
+                      jobTitle: formData.jobTitle,
+                      companyName: formData.companyName,
+                      workType: formData.workType,
+                      currentStatus: formData.currentStatus,
+                      tags: formData.tags ?? [],
+                    }
+                  : item,
+              ),
+            );
 
       await fetchApplicationDetails(selectedApplicationId);
       await fetchTags();
@@ -456,6 +492,10 @@ export function JobApplicationsPage() {
   };
 
   const handleCreateComment = async (rawComment: string): Promise<boolean> => {
+    if (isReadOnly) {
+      return false;
+    }
+
     if (!selectedApplicationId || !rawComment.trim()) {
       return false;
     }
@@ -484,6 +524,10 @@ export function JobApplicationsPage() {
   };
 
   const handleDeleteComment = async (commentId: string) => {
+    if (isReadOnly) {
+      return;
+    }
+
     if (!selectedApplicationId) {
       return;
     }
@@ -502,6 +546,10 @@ export function JobApplicationsPage() {
   };
 
   const handleDeleteApplication = async () => {
+    if (isReadOnly) {
+      return;
+    }
+
     if (!selectedApplicationId) {
       return;
     }
@@ -532,11 +580,77 @@ export function JobApplicationsPage() {
     setShowDeleteDialog(true);
   };
 
+  const handleArchiveApplication = async () => {
+    if (!selectedApplicationId || selectedApplicationIsArchived) {
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const response = await Api.PATCH("/api/v1/job-applications/{id}/archive", {
+        params: { path: { id: selectedApplicationId } },
+      });
+
+      if (response.error) {
+        toast.error("Failed to archive job application");
+        return;
+      }
+
+      toast.success("Job application archived");
+      setIsListLoading(true);
+      await fetchApplications(0, false, activeFilters);
+      setIsListLoading(false);
+
+      if (listState === JOB_APPLICATION_LIST_STATES.ACTIVE) {
+        resetDetails();
+        return;
+      }
+
+      await fetchApplicationDetails(selectedApplicationId);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleUnarchiveApplication = async () => {
+    if (!selectedApplicationId || !selectedApplicationIsArchived) {
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const response = await Api.PATCH("/api/v1/job-applications/{id}/unarchive", {
+        params: { path: { id: selectedApplicationId } },
+      });
+
+      if (response.error) {
+        toast.error("Failed to unarchive job application");
+        return;
+      }
+
+      toast.success("Job application unarchived");
+      setIsListLoading(true);
+      await fetchApplications(0, false, activeFilters);
+      setIsListLoading(false);
+
+      if (listState === JOB_APPLICATION_LIST_STATES.ARCHIVED) {
+        resetDetails();
+        return;
+      }
+
+      await fetchApplicationDetails(selectedApplicationId);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <>
       <ListWithSideSheetLayout
         sheetOpen={isCreating || !!selectedApplicationId}
-        sheetTitle={isCreating ? "Create Job Application" : "Edit Job Application"}
+        sheetTitle={isCreating ? "Create Job Application" : isReadOnly ? "Job Application Details" : "Edit Job Application"}
         onSheetOpenChange={(open) => {
           if (!open) {
             handleCloseDetails();
@@ -555,6 +669,7 @@ export function JobApplicationsPage() {
             total={total}
             isListLoading={isListLoading}
             isLoadingMore={isLoadingMore}
+            isReadOnly={isReadOnly}
             onCreate={handleCreate}
             onSearchChange={setSearchInput}
             onStatusToggle={(value, checked) =>
@@ -592,27 +707,40 @@ export function JobApplicationsPage() {
             comments={comments}
             statusHistory={statusHistory}
             isCommentSubmitting={isCommentSubmitting}
+            isReadOnly={isReadOnly}
             onClose={handleCloseDetails}
             onFormChange={handleFormChange}
             onAddTag={handleAddTag}
             onToggleTag={handleToggleTag}
             onSave={() => void handleSave()}
             onDelete={handleDeleteClick}
+            onArchive={
+              !isCreating && !selectedApplicationIsArchived && !isReadOnly
+                ? () => void handleArchiveApplication()
+                : undefined
+            }
+            onUnarchive={
+              !isCreating && selectedApplicationIsArchived && isReadOnly
+                ? () => void handleUnarchiveApplication()
+                : undefined
+            }
             onAddComment={handleCreateComment}
             onDeleteComment={(id) => void handleDeleteComment(id)}
           />
         }
       />
-      <ConfirmDialog
-        open={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
-        onConfirm={() => void handleDeleteApplication()}
-        title="Delete Job Application"
-        description="Are you sure you want to delete this job application? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
-        variant="destructive"
-      />
+      {!isReadOnly ? (
+        <ConfirmDialog
+          open={showDeleteDialog}
+          onOpenChange={setShowDeleteDialog}
+          onConfirm={() => void handleDeleteApplication()}
+          title="Delete Job Application"
+          description="Are you sure you want to delete this job application? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+          variant="destructive"
+        />
+      ) : null}
     </>
   );
 }

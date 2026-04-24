@@ -9,6 +9,7 @@ const CURRENCY_OPTIONS = ["USD", "EUR", "PLN", "GBP", "CHF", "CAD", "AUD", "SEK"
 interface JobApplicationSalaryFieldsProps {
   salary: UpdateSalaryDto;
   salaryLabel: string;
+  isReadOnly?: boolean;
   onAmountChange: (
     salaryType: number | string,
     field: "offerFrom" | "offerTo" | "expectedFrom" | "expectedTo",
@@ -33,6 +34,7 @@ const parseSalaryAmount = (rawValue: string): number | null => {
 export function JobApplicationSalaryFields({
   salary,
   salaryLabel,
+  isReadOnly = false,
   onAmountChange,
   onCurrencyChange,
 }: JobApplicationSalaryFieldsProps) {
@@ -44,6 +46,7 @@ export function JobApplicationSalaryFields({
           <Input
             type="number"
             value={salary.offerFrom?.toString() ?? ""}
+            disabled={isReadOnly}
             onChange={(event) => onAmountChange(salary.salaryType, "offerFrom", parseSalaryAmount(event.target.value))}
           />
         </FormField>
@@ -51,6 +54,7 @@ export function JobApplicationSalaryFields({
           <Input
             type="number"
             value={salary.offerTo?.toString() ?? ""}
+            disabled={isReadOnly}
             onChange={(event) => onAmountChange(salary.salaryType, "offerTo", parseSalaryAmount(event.target.value))}
           />
         </FormField>
@@ -58,6 +62,7 @@ export function JobApplicationSalaryFields({
           <Input
             type="number"
             value={salary.expectedFrom?.toString() ?? ""}
+            disabled={isReadOnly}
             onChange={(event) => onAmountChange(salary.salaryType, "expectedFrom", parseSalaryAmount(event.target.value))}
           />
         </FormField>
@@ -65,6 +70,7 @@ export function JobApplicationSalaryFields({
           <Input
             type="number"
             value={salary.expectedTo?.toString() ?? ""}
+            disabled={isReadOnly}
             onChange={(event) => onAmountChange(salary.salaryType, "expectedTo", parseSalaryAmount(event.target.value))}
           />
         </FormField>
@@ -72,6 +78,7 @@ export function JobApplicationSalaryFields({
           <select
             className="h-9 w-full rounded-md border bg-background px-3 text-sm"
             value={salary.currency ?? ""}
+            disabled={isReadOnly}
             onChange={(event) => onCurrencyChange(salary.salaryType, event.target.value)}
           >
             <option value=""></option>

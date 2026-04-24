@@ -246,6 +246,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/job-applications/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        trace?: never;
+    };
     "/api/v1/job-applications": {
         parameters: {
             query?: never;
@@ -261,6 +303,7 @@ export interface paths {
                     Statuses?: (number | string)[];
                     Tags?: string[];
                     WorkTypes?: (number | string)[];
+                    State?: string;
                     Search?: string;
                 };
                 header?: never;
@@ -506,6 +549,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/job-applications/{id}/unarchive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        trace?: never;
+    };
     "/api/v1/auth/login": {
         parameters: {
             query?: never;
@@ -680,6 +765,7 @@ export interface components {
             workType: number | string;
             /** Format: int32 */
             currentStatus: number | string;
+            isArchived: boolean;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -745,6 +831,7 @@ export interface components {
             workType: number | string;
             /** Format: int32 */
             currentStatus: number | string;
+            isArchived: boolean;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */

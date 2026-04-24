@@ -268,4 +268,53 @@ public class UpdateJobApplicationTests
             jobApplicationId,
             Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    public async Task HandleAsync_ShouldUpdateArchivedJobApplication_WhenOwnedByUser()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var request = new UpdateJobApplicationRequest
+        {
+            Id = Guid.NewGuid(),
+            JobTitle = "Updated Job Title",
+            CompanyName = "Updated Company",
+            WorkType = 1,
+            CurrentStatus = 0,
+        };
+
+        var archivedJobApplication = new JobApplicationEntity
+        {
+            Id = request.Id,
+            UserId = userId,
+            JobTitle = "Old Job Title",
+            CompanyName = "Old Company",
+            WorkType = WorkType.Remote,
+            CurrentStatus = JobApplicationStatus.Applied,
+            IsArchived = true,
+        };
+
+        this.jobApplicationRepository.GetByIdAsync(request.Id, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<JobApplicationEntity?>(archivedJobApplication));
+        this.jobApplicationRepository.ListSalariesByJobApplicationIdAsync(request.Id, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyList<JobApplicationSalaryEntity>>([]));
+        this.jobApplicationRepository.ListTagsByJobApplicationIdAsync(request.Id, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyList<JobApplicationTagEntity>>([]));
+
+        // Act
+        var result = await UpdateJobApplication.HandleAsync(
+            request,
+            userId,
+            this.jobApplicationRepository,
+            this.tagRepository,
+            CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        archivedJobApplication.JobTitle.Should().Be("Updated Job Title");
+        archivedJobApplication.CompanyName.Should().Be("Updated Company");
+        archivedJobApplication.IsArchived.Should().BeTrue();
+        this.jobApplicationRepository.Received(1).Update(Arg.Is(archivedJobApplication));
+        await this.jobApplicationRepository.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
 }

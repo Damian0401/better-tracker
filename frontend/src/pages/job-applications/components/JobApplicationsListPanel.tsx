@@ -17,6 +17,7 @@ interface JobApplicationsListPanelProps {
   total: number;
   isListLoading: boolean;
   isLoadingMore: boolean;
+  isReadOnly?: boolean;
   onCreate: () => void;
   onSearchChange: (value: string) => void;
   onStatusToggle: (value: string, checked: boolean) => void;
@@ -35,6 +36,7 @@ export function JobApplicationsListPanel({
   total,
   isListLoading,
   isLoadingMore,
+  isReadOnly = false,
   onCreate,
   onSearchChange,
   onStatusToggle,
@@ -46,9 +48,11 @@ export function JobApplicationsListPanel({
   return (
     <div className="flex h-full flex-col">
       <div className="space-y-3 border-b p-4">
-        <Button onClick={onCreate} className="w-full">
-          Create Application
-        </Button>
+        {!isReadOnly ? (
+          <Button onClick={onCreate} className="w-full">
+            Create Application
+          </Button>
+        ) : null}
 
         <Input
           placeholder="Search applications"

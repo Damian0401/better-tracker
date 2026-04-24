@@ -13,6 +13,7 @@ public sealed record ListJobApplicationsItemDto
     public required string CompanyName { get; init; }
     public required int WorkType { get; init; }
     public required int CurrentStatus { get; init; }
+    public required bool IsArchived { get; init; }
     public required DateTimeOffset CreatedAt { get; init; }
     public required DateTimeOffset UpdatedAt { get; init; }
     public required IReadOnlyList<string> Tags { get; init; }

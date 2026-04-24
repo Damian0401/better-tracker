@@ -35,6 +35,7 @@ public class ListJobApplicationsEndpoint : IApiEndpoint
             parameters.Statuses,
             parameters.Tags,
             parameters.WorkTypes,
+            parameters.State,
             parameters.Search,
             userIdResult.Data,
             services.DbContext,
@@ -59,6 +60,9 @@ public class ListJobApplicationsEndpoint : IApiEndpoint
 
         [FromQuery]
         public int[]? WorkTypes { get; init; }
+
+        [FromQuery]
+        public string? State { get; init; }
 
         [FromQuery]
         public string? Search { get; init; }

@@ -17,6 +17,7 @@ public sealed record JobApplicationEntity : BaseEntity<Guid>
     public string? Experience { get; set; }
     public required WorkType WorkType { get; set; }
     public required JobApplicationStatus CurrentStatus { get; set; }
+    public bool IsArchived { get; set; }
     public UserEntity? User { get; set; }
 
     internal class Configuration : BaseConfiguration<JobApplicationEntity>
@@ -37,12 +38,13 @@ public sealed record JobApplicationEntity : BaseEntity<Guid>
             builder.Property(e => e.Experience);
             builder.Property(e => e.WorkType).IsRequired();
             builder.Property(e => e.CurrentStatus).IsRequired();
+            builder.Property(e => e.IsArchived).HasDefaultValue(false).IsRequired();
             builder.HasOne(e => e.User)
                 .WithMany()
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
             builder.HasIndex(e => new { e.UserId, e.CurrentStatus });
-            builder.HasIndex(e => new { e.UserId, e.CreatedAt });
+            builder.HasIndex(e => new { e.UserId, e.IsArchived, e.CreatedAt });
         }
     }
 }

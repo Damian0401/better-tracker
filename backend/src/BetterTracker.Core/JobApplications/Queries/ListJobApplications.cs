@@ -8,6 +8,9 @@ namespace BetterTracker.Core.JobApplications.Queries;
 public static class ListJobApplications
 {
     private const int DefaultCount = 10;
+    private const string ActiveState = "active";
+    private const string ArchivedState = "archived";
+    private const string AllState = "all";
 
     public static async ValueTask<ListJobApplicationsResponse> HandleAsync(
         int? count,
@@ -15,6 +18,7 @@ public static class ListJobApplications
         IReadOnlyList<int>? statuses,
         IReadOnlyList<string>? tags,
         IReadOnlyList<int>? workTypes,
+        string? state,
         string? search,
         Guid userId,
         AppDbContext dbContext,
@@ -26,6 +30,14 @@ public static class ListJobApplications
         var query = dbContext.JobApplications
             .Where(x => x.UserId == userId)
             .AsQueryable();
+
+        var normalizedState = NormalizeState(state);
+        query = normalizedState switch
+        {
+            ArchivedState => query.Where(x => x.IsArchived),
+            AllState => query,
+            _ => query.Where(x => !x.IsArchived),
+        };
 
         var parsedStatuses = statuses?
             .Where(x => Enum.IsDefined((JobApplicationStatus)x))
@@ -88,6 +100,7 @@ public static class ListJobApplications
                 CompanyName = x.CompanyName,
                 WorkType = (int)x.WorkType,
                 CurrentStatus = (int)x.CurrentStatus,
+                IsArchived = x.IsArchived,
                 CreatedAt = x.CreatedAt,
                 UpdatedAt = x.UpdatedAt,
                 Tags = new List<string>(),
@@ -125,5 +138,18 @@ public static class ListJobApplications
             Total = total,
             Items = items,
         };
+    }
+
+    private static string NormalizeState(string? state)
+    {
+        if (string.IsNullOrWhiteSpace(state))
+        {
+            return ActiveState;
+        }
+
+        var normalizedState = state.Trim().ToLowerInvariant();
+        return normalizedState is ArchivedState or AllState
+            ? normalizedState
+            : ActiveState;
     }
 }
