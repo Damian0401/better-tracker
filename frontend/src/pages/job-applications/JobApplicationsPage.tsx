@@ -17,6 +17,8 @@ type StatusHistoryDto = components["schemas"]["GetJobApplicationByIdStatusHistor
 type CreateRequest = components["schemas"]["CreateJobApplicationRequest"];
 type UpdateRequest = components["schemas"]["UpdateJobApplicationBody"];
 type ListMyTagsItemDto = components["schemas"]["ListMyTagsItemDto"];
+type SalaryTypeOption = components["schemas"]["GetJobApplicationDropdownOption"];
+type UpdateSalaryDto = components["schemas"]["UpdateJobApplicationSalaryDto"];
 
 const PAGE_SIZE = 10;
 const SEARCH_DEBOUNCE_MS = 500;
@@ -40,6 +42,35 @@ const emptyFormData: UpdateRequest = {
   currentStatus: 0,
   salaries: [],
   tags: [],
+};
+
+const ensureAllSalaryTypes = (
+  salaries: UpdateRequest["salaries"],
+  salaryTypes: SalaryTypeOption[],
+): UpdateSalaryDto[] => {
+  const currentSalaries = salaries ?? [];
+
+  return salaryTypes.map((salaryType) => {
+    const existingSalary = currentSalaries.find(
+      (item) => item.salaryType.toString() === salaryType.value.toString(),
+    );
+
+    if (existingSalary) {
+      return {
+        salaryType: salaryType.value,
+        salaryPost: existingSalary.salaryPost ?? null,
+        salaryCandidate: existingSalary.salaryCandidate ?? null,
+        currency: existingSalary.currency ?? "",
+      };
+    }
+
+    return {
+      salaryType: salaryType.value,
+      salaryPost: null,
+      salaryCandidate: null,
+      currency: "",
+    };
+  });
 };
 
 const mapDetailsToUpdateRequest = (details: DetailsDto): UpdateRequest => ({
@@ -106,6 +137,14 @@ export function JobApplicationsPage() {
     }
 
     setDropdowns(response.data);
+    setFormData((prev) => ({
+      ...prev,
+      salaries: ensureAllSalaryTypes(prev.salaries, response.data.salaryTypes),
+    }));
+    setBaselineFormData((prev) => ({
+      ...prev,
+      salaries: ensureAllSalaryTypes(prev.salaries, response.data.salaryTypes),
+    }));
   };
 
   const fetchTags = async () => {
@@ -191,8 +230,12 @@ export function JobApplicationsPage() {
 
       const details = response.data.jobApplication;
       const mapped = mapDetailsToUpdateRequest(details);
-      setFormData(mapped);
-      setBaselineFormData(mapped);
+      const mappedWithSalaries: UpdateRequest = {
+        ...mapped,
+        salaries: ensureAllSalaryTypes(mapped.salaries, dropdowns.salaryTypes),
+      };
+      setFormData(mappedWithSalaries);
+      setBaselineFormData(mappedWithSalaries);
       setComments(details.comments);
       setStatusHistory(details.statusHistory);
     } finally {
@@ -259,6 +302,7 @@ export function JobApplicationsPage() {
       ...emptyFormData,
       workType: defaultWorkType,
       currentStatus: defaultStatus,
+      salaries: ensureAllSalaryTypes([], dropdowns.salaryTypes),
     };
 
     setFormData(nextFormData);
@@ -333,7 +377,7 @@ export function JobApplicationsPage() {
     link: normalizeTextInput(formData.link ?? ""),
     technologies: normalizeTextInput(formData.technologies ?? ""),
     experience: normalizeTextInput(formData.experience ?? ""),
-    salaries: formData.salaries ?? [],
+    salaries: ensureAllSalaryTypes(formData.salaries, dropdowns.salaryTypes),
     tags: formData.tags ?? [],
   });
 

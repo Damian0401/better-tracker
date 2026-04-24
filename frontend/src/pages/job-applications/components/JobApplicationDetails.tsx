@@ -16,6 +16,7 @@ type UpdateRequest = components["schemas"]["UpdateJobApplicationBody"];
 type CommentDto = components["schemas"]["GetJobApplicationByIdCommentDto"];
 type StatusHistoryDto = components["schemas"]["GetJobApplicationByIdStatusHistoryDto"];
 type ListMyTagsItemDto = components["schemas"]["ListMyTagsItemDto"];
+type UpdateSalaryDto = components["schemas"]["UpdateJobApplicationSalaryDto"];
 
 interface JobApplicationDetailsProps {
   isCreating: boolean;
@@ -99,6 +100,39 @@ export function JobApplicationDetails({
     if (wasAdded) {
       setNewComment("");
     }
+  };
+
+  const updateSalary = (
+    salaryTypeValue: number | string,
+    field: keyof UpdateSalaryDto,
+    value: UpdateSalaryDto[keyof UpdateSalaryDto],
+  ) => {
+    const currentSalaries = formData.salaries ?? [];
+    const nextSalaries = currentSalaries.map((salary) => {
+      if (salary.salaryType.toString() !== salaryTypeValue.toString()) {
+        return salary;
+      }
+
+      return {
+        ...salary,
+        [field]: value,
+      };
+    });
+
+    onFormChange("salaries", nextSalaries);
+  };
+
+  const parseSalaryAmount = (rawValue: string): number | null => {
+    if (!rawValue.trim()) {
+      return null;
+    }
+
+    const parsed = Number(rawValue);
+    if (Number.isNaN(parsed)) {
+      return null;
+    }
+
+    return parsed;
   };
 
   return (
@@ -224,6 +258,52 @@ export function JobApplicationDetails({
                 onChange={(event) => onFormChange("benefits", event.target.value)}
                 rows={4}
               />
+            </FormField>
+
+            <FormField label="Salaries (monthly)">
+              <div className="space-y-3">
+                {(formData.salaries ?? []).map((salary) => {
+                  const salaryType = dropdowns.salaryTypes.find(
+                    (option) => option.value.toString() === salary.salaryType.toString(),
+                  );
+                  const salaryLabel = salaryType?.name ?? salary.salaryType.toString();
+
+                  return (
+                    <div key={salary.salaryType.toString()} className="rounded-md border p-3">
+                      <div className="mb-2 text-sm font-medium">{salaryLabel}</div>
+                      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                        <FormField label="Offer">
+                          <Input
+                            type="number"
+                            value={salary.salaryPost?.toString() ?? ""}
+                            onChange={(event) =>
+                              updateSalary(salary.salaryType, "salaryPost", parseSalaryAmount(event.target.value))
+                            }
+                            placeholder="e.g. 10000"
+                          />
+                        </FormField>
+                        <FormField label="Expected">
+                          <Input
+                            type="number"
+                            value={salary.salaryCandidate?.toString() ?? ""}
+                            onChange={(event) =>
+                              updateSalary(salary.salaryType, "salaryCandidate", parseSalaryAmount(event.target.value))
+                            }
+                            placeholder="e.g. 12000"
+                          />
+                        </FormField>
+                        <FormField label="Currency">
+                          <Input
+                            value={salary.currency ?? ""}
+                            onChange={(event) => updateSalary(salary.salaryType, "currency", event.target.value)}
+                            placeholder="e.g. USD"
+                          />
+                        </FormField>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </FormField>
 
             <FormField label="Tags">
