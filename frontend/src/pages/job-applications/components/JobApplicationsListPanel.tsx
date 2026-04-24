@@ -144,8 +144,10 @@ export function JobApplicationsListPanel({
               selectedApplicationId === application.id ? "bg-muted" : ""
             }`}
           >
-            <h3 className="truncate font-medium">{application.jobTitle}</h3>
-            <p className="mt-1 truncate text-sm text-muted-foreground">{application.companyName}</p>
+            <h3 className="truncate font-medium">{`${application.jobTitle} (${application.companyName})`}</h3>
+            <p className="mt-1 truncate text-sm text-muted-foreground">
+              {getOptionLabel(dropdowns.workTypes, application.workType)}
+            </p>
             <p className="mt-1 text-xs text-muted-foreground">
               {getOptionLabel(dropdowns.jobApplicationStatuses, application.currentStatus)}
             </p>

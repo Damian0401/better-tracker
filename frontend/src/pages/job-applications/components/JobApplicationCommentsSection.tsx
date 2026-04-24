@@ -1,5 +1,5 @@
 import type { components } from "@/libs/api.schema.g";
-import { formatDate } from "@/libs/utils";
+import { formatDateTime } from "@/libs/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -50,7 +50,7 @@ export function JobApplicationCommentsSection({
             <div key={comment.id} className="rounded-md border p-3">
               <p className="text-sm">{comment.content}</p>
               <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-                <span>{formatDate(comment.createdAt)}</span>
+                <span>{formatDateTime(comment.createdAt)}</span>
                 {!isReadOnly ? (
                   <Button
                     type="button"
