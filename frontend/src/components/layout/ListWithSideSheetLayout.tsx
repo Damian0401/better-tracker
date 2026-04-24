@@ -10,6 +10,7 @@ interface ListWithSideSheetLayoutProps {
   sheetContent: ReactNode;
   leftPanelClassName?: string;
   sheetWidthClassName?: string;
+  sheetTitle?: string;
 }
 
 export function ListWithSideSheetLayout({
@@ -19,6 +20,7 @@ export function ListWithSideSheetLayout({
   sheetContent,
   leftPanelClassName,
   sheetWidthClassName,
+  sheetTitle,
 }: ListWithSideSheetLayoutProps) {
   const [container, setContainer] = useState<HTMLElement | null>(null);
 
@@ -30,6 +32,7 @@ export function ListWithSideSheetLayout({
         onOpenChange={onSheetOpenChange}
         container={container}
         widthClassName={sheetWidthClassName}
+        title={sheetTitle}
       >
         {sheetContent}
       </RightSheet>

@@ -8,6 +8,7 @@ interface RightSheetProps {
   container: HTMLElement | null;
   children: ReactNode;
   widthClassName?: string;
+  title?: string;
 }
 
 export function RightSheet({
@@ -16,6 +17,7 @@ export function RightSheet({
   container,
   children,
   widthClassName,
+  title = "Details panel",
 }: RightSheetProps) {
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
@@ -28,6 +30,7 @@ export function RightSheet({
             widthClassName
           )}
         >
+          <DialogPrimitive.Title className="sr-only">{title}</DialogPrimitive.Title>
           {children}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>

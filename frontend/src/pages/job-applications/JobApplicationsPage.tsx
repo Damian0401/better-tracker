@@ -488,6 +488,7 @@ export function JobApplicationsPage() {
     <>
       <ListWithSideSheetLayout
         sheetOpen={isCreating || !!selectedApplicationId}
+        sheetTitle={isCreating ? "Create Job Application" : "Edit Job Application"}
         onSheetOpenChange={(open) => {
           if (!open) {
             handleCloseDetails();

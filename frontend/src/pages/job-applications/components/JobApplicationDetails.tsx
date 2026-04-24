@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { ClockIcon } from "@/components/icons/ClockIcon";
 import { FormField } from "@/components/FormField";
 import { JobApplicationCommentsSection } from "./JobApplicationCommentsSection";
 
@@ -150,10 +151,7 @@ export function JobApplicationDetails({
                         onClick={() => setIsStatusHistoryOpen((prev) => !prev)}
                         title={isStatusHistoryOpen ? "Hide status history" : "Show status history"}
                       >
-                        <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
-                          <circle cx="12" cy="12" r="9" />
-                          <path d="M12 7v5l3 2" />
-                        </svg>
+                        <ClockIcon aria-hidden="true" className="h-4 w-4" />
                         <span className="sr-only">Toggle status history</span>
                       </Button>
                     ) : null}

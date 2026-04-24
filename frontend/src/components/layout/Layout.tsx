@@ -1,26 +1,20 @@
-import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { cn } from "@/libs/utils/cn";
+import type { ReactNode } from "react";
+import { useRouter } from "@tanstack/react-router";
 import { Auth } from "@/libs/auth";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { UserIcon } from "@/components/icons/UserIcon";
+import { PageNavigation } from "@/components/layout/PageNavigation";
 import { Routes } from "@/constants";
 
 interface LayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function Layout({ children }: LayoutProps) {
   const router = useRouter();
-  const routerState = useRouterState();
-  const currentPath = routerState.location.pathname;
   const isAuthenticated = Auth.isAuthenticated();
   const user = Auth.getUser();
-
-  const navItems = [
-    { path: Routes.HOME, label: "Home" },
-    { path: Routes.JOB_APPLICATIONS, label: "Applications" },
-    { path: Routes.NOTES, label: "Notes" },
-  ];
 
   const handleLogout = () => {
     Auth.removeToken();
@@ -28,37 +22,14 @@ export function Layout({ children }: LayoutProps) {
   };
 
   return (
-    <div className="flex h-screen">
-      {/* Left Sidebar */}
-      <aside className="w-64 border-r bg-muted/40">
-        <div className="flex h-full flex-col">
-          <div className="border-b p-6">
-            <h1 className="text-2xl font-bold">BetterTracker</h1>
-          </div>
-          <nav className="flex-1 space-y-1 p-4">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  "block rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                  currentPath === item.path
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-muted"
-                )}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      </aside>
+    <div className="flex h-screen flex-col md:flex-row">
+      <PageNavigation />
 
-      {/* Main Content */}
       <main className="flex flex-col flex-1 overflow-hidden">
         <div className="flex shrink-0 items-center justify-end gap-3 p-4">
           {isAuthenticated && user && (
-            <div className="rounded-md border bg-card px-3 py-1.5 text-sm font-medium text-foreground shadow-sm">
+            <div className="flex items-center gap-2 rounded-md border bg-card px-3 py-1.5 text-sm font-medium text-foreground shadow-sm">
+              <UserIcon aria-hidden="true" className="h-4 w-4 text-muted-foreground" />
               {user.userName}
             </div>
           )}
