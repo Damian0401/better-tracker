@@ -65,8 +65,10 @@ public class UpdateJobApplicationTests
                 new UpdateJobApplicationSalaryDto
                 {
                     SalaryType = 0,
-                    SalaryPost = 10000,
-                    SalaryCandidate = 12000,
+                    OfferFrom = 10000,
+                    OfferTo = 12000,
+                    ExpectedFrom = 13000,
+                    ExpectedTo = 14000,
                     Currency = "usd",
                 }
             ],
@@ -127,8 +129,10 @@ public class UpdateJobApplicationTests
                 new UpdateJobApplicationSalaryDto
                 {
                     SalaryType = 0,
-                    SalaryPost = 15000,
-                    SalaryCandidate = 17000,
+                    OfferFrom = 15000,
+                    OfferTo = 17000,
+                    ExpectedFrom = 18000,
+                    ExpectedTo = 19000,
                     Currency = "eur",
                 }
             ],
@@ -150,8 +154,10 @@ public class UpdateJobApplicationTests
             Id = Guid.NewGuid(),
             JobApplicationId = jobApplicationId,
             SalaryType = SalaryType.B2B,
-            SalaryPost = 10000,
-            SalaryCandidate = 11000,
+            OfferFrom = 10000,
+            OfferTo = 11000,
+            ExpectedFrom = 12000,
+            ExpectedTo = 13000,
             Currency = "USD",
         };
 
@@ -188,8 +194,10 @@ public class UpdateJobApplicationTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        existingSalary.SalaryPost.Should().Be(15000);
-        existingSalary.SalaryCandidate.Should().Be(17000);
+        existingSalary.OfferFrom.Should().Be(15000);
+        existingSalary.OfferTo.Should().Be(17000);
+        existingSalary.ExpectedFrom.Should().Be(18000);
+        existingSalary.ExpectedTo.Should().Be(19000);
         existingSalary.Currency.Should().Be("EUR");
         this.jobApplicationRepository.DidNotReceive().AddSalary(Arg.Any<JobApplicationSalaryEntity>());
         this.jobApplicationRepository.DidNotReceive().RemoveSalaries(Arg.Any<IEnumerable<JobApplicationSalaryEntity>>());

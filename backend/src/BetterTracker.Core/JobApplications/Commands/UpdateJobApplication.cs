@@ -111,8 +111,10 @@ public static class UpdateJobApplication
         {
             if (existingSalariesByType.TryGetValue(salaryType, out var existingSalary))
             {
-                existingSalary.SalaryPost = salaryDto.SalaryPost;
-                existingSalary.SalaryCandidate = salaryDto.SalaryCandidate;
+                existingSalary.OfferFrom = salaryDto.OfferFrom;
+                existingSalary.OfferTo = salaryDto.OfferTo;
+                existingSalary.ExpectedFrom = salaryDto.ExpectedFrom;
+                existingSalary.ExpectedTo = salaryDto.ExpectedTo;
                 existingSalary.Currency = NormalizeNullable(salaryDto.Currency)?.ToUpperInvariant();
                 continue;
             }
@@ -121,8 +123,10 @@ public static class UpdateJobApplication
             {
                 JobApplicationId = jobApplication.Id,
                 SalaryType = salaryType,
-                SalaryPost = salaryDto.SalaryPost,
-                SalaryCandidate = salaryDto.SalaryCandidate,
+                OfferFrom = salaryDto.OfferFrom,
+                OfferTo = salaryDto.OfferTo,
+                ExpectedFrom = salaryDto.ExpectedFrom,
+                ExpectedTo = salaryDto.ExpectedTo,
                 Currency = NormalizeNullable(salaryDto.Currency)?.ToUpperInvariant(),
             });
         }

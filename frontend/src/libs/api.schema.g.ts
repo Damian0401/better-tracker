@@ -636,9 +636,13 @@ export interface components {
             /** Format: int32 */
             salaryType: number | string;
             /** Format: double */
-            salaryPost?: null | number | string;
+            offerFrom?: null | number | string;
             /** Format: double */
-            salaryCandidate?: null | number | string;
+            offerTo?: null | number | string;
+            /** Format: double */
+            expectedFrom?: null | number | string;
+            /** Format: double */
+            expectedTo?: null | number | string;
             currency?: null | string;
         };
         CreateNoteRequest: {
@@ -692,9 +696,13 @@ export interface components {
             /** Format: int32 */
             salaryType: number | string;
             /** Format: double */
-            salaryPost?: null | number | string;
+            offerFrom?: null | number | string;
             /** Format: double */
-            salaryCandidate?: null | number | string;
+            offerTo?: null | number | string;
+            /** Format: double */
+            expectedFrom?: null | number | string;
+            /** Format: double */
+            expectedTo?: null | number | string;
             currency?: null | string;
         };
         GetJobApplicationByIdStatusHistoryDto: {
@@ -800,9 +808,13 @@ export interface components {
             /** Format: int32 */
             salaryType: number | string;
             /** Format: double */
-            salaryPost?: null | number | string;
+            offerFrom?: null | number | string;
             /** Format: double */
-            salaryCandidate?: null | number | string;
+            offerTo?: null | number | string;
+            /** Format: double */
+            expectedFrom?: null | number | string;
+            /** Format: double */
+            expectedTo?: null | number | string;
             currency?: null | string;
         };
         UpdateNoteBody: {

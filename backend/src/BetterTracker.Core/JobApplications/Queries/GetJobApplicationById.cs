@@ -58,8 +58,10 @@ public static class GetJobApplicationById
             .Select(x => new GetJobApplicationByIdSalaryDto
             {
                 SalaryType = (int)x.SalaryType,
-                SalaryPost = x.SalaryPost,
-                SalaryCandidate = x.SalaryCandidate,
+                OfferFrom = x.OfferFrom,
+                OfferTo = x.OfferTo,
+                ExpectedFrom = x.ExpectedFrom,
+                ExpectedTo = x.ExpectedTo,
                 Currency = x.Currency,
             })
             .ToListAsync(cancellationToken);

@@ -34,8 +34,10 @@ public class CreateJobApplicationTests
                 new CreateJobApplicationSalaryDto
                 {
                     SalaryType = 0,
-                    SalaryPost = 10000,
-                    SalaryCandidate = 12000,
+                    OfferFrom = 10000,
+                    OfferTo = 12000,
+                    ExpectedFrom = 13000,
+                    ExpectedTo = 14000,
                     Currency = "pln",
                 }
             ]

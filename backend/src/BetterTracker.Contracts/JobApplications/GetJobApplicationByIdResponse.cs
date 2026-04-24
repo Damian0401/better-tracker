@@ -29,8 +29,10 @@ public sealed record GetJobApplicationByIdDto
 public sealed record GetJobApplicationByIdSalaryDto
 {
     public required int SalaryType { get; init; }
-    public decimal? SalaryPost { get; init; }
-    public decimal? SalaryCandidate { get; init; }
+    public decimal? OfferFrom { get; init; }
+    public decimal? OfferTo { get; init; }
+    public decimal? ExpectedFrom { get; init; }
+    public decimal? ExpectedTo { get; init; }
     public string? Currency { get; init; }
 }
 

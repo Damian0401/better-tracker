@@ -63,8 +63,10 @@ public static class CreateJobApplication
             {
                 JobApplicationId = jobApplication.Id,
                 SalaryType = (SalaryType)salaryDto.SalaryType,
-                SalaryPost = salaryDto.SalaryPost,
-                SalaryCandidate = salaryDto.SalaryCandidate,
+                OfferFrom = salaryDto.OfferFrom,
+                OfferTo = salaryDto.OfferTo,
+                ExpectedFrom = salaryDto.ExpectedFrom,
+                ExpectedTo = salaryDto.ExpectedTo,
                 Currency = NormalizeNullable(salaryDto.Currency)?.ToUpperInvariant(),
             };
 

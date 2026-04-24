@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ClockIcon } from "@/components/icons/ClockIcon";
 import { FormField } from "@/components/FormField";
 import { JobApplicationCommentsSection } from "./JobApplicationCommentsSection";
+import { JobApplicationSalaryFields } from "./JobApplicationSalaryFields";
 
 type DropdownsResponse = components["schemas"]["GetJobApplicationDropdownsResponse"];
 type UpdateRequest = components["schemas"]["UpdateJobApplicationBody"];
@@ -122,17 +123,24 @@ export function JobApplicationDetails({
     onFormChange("salaries", nextSalaries);
   };
 
-  const parseSalaryAmount = (rawValue: string): number | null => {
-    if (!rawValue.trim()) {
-      return null;
+  const handleCurrencyChange = (salaryTypeValue: number | string, currency: string) => {
+    const currentSalaries = formData.salaries ?? [];
+    const areOtherCurrenciesEmpty = currentSalaries
+      .filter((salary) => salary.salaryType.toString() !== salaryTypeValue.toString())
+      .every((salary) => !(salary.currency ?? "").trim());
+
+    if (currency && areOtherCurrenciesEmpty) {
+      onFormChange(
+        "salaries",
+        currentSalaries.map((salary) => ({
+          ...salary,
+          currency,
+        })),
+      );
+      return;
     }
 
-    const parsed = Number(rawValue);
-    if (Number.isNaN(parsed)) {
-      return null;
-    }
-
-    return parsed;
+    updateSalary(salaryTypeValue, "currency", currency);
   };
 
   return (
@@ -269,38 +277,13 @@ export function JobApplicationDetails({
                   const salaryLabel = salaryType?.name ?? salary.salaryType.toString();
 
                   return (
-                    <div key={salary.salaryType.toString()} className="rounded-md border p-3">
-                      <div className="mb-2 text-sm font-medium">{salaryLabel}</div>
-                      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                        <FormField label="Offer">
-                          <Input
-                            type="number"
-                            value={salary.salaryPost?.toString() ?? ""}
-                            onChange={(event) =>
-                              updateSalary(salary.salaryType, "salaryPost", parseSalaryAmount(event.target.value))
-                            }
-                            placeholder="e.g. 10000"
-                          />
-                        </FormField>
-                        <FormField label="Expected">
-                          <Input
-                            type="number"
-                            value={salary.salaryCandidate?.toString() ?? ""}
-                            onChange={(event) =>
-                              updateSalary(salary.salaryType, "salaryCandidate", parseSalaryAmount(event.target.value))
-                            }
-                            placeholder="e.g. 12000"
-                          />
-                        </FormField>
-                        <FormField label="Currency">
-                          <Input
-                            value={salary.currency ?? ""}
-                            onChange={(event) => updateSalary(salary.salaryType, "currency", event.target.value)}
-                            placeholder="e.g. USD"
-                          />
-                        </FormField>
-                      </div>
-                    </div>
+                    <JobApplicationSalaryFields
+                      key={salary.salaryType.toString()}
+                      salary={salary}
+                      salaryLabel={salaryLabel}
+                      onAmountChange={updateSalary}
+                      onCurrencyChange={handleCurrencyChange}
+                    />
                   );
                 })}
               </div>

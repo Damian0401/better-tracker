@@ -58,16 +58,20 @@ const ensureAllSalaryTypes = (
     if (existingSalary) {
       return {
         salaryType: salaryType.value,
-        salaryPost: existingSalary.salaryPost ?? null,
-        salaryCandidate: existingSalary.salaryCandidate ?? null,
+        offerFrom: existingSalary.offerFrom ?? null,
+        offerTo: existingSalary.offerTo ?? null,
+        expectedFrom: existingSalary.expectedFrom ?? null,
+        expectedTo: existingSalary.expectedTo ?? null,
         currency: existingSalary.currency ?? "",
       };
     }
 
     return {
       salaryType: salaryType.value,
-      salaryPost: null,
-      salaryCandidate: null,
+      offerFrom: null,
+      offerTo: null,
+      expectedFrom: null,
+      expectedTo: null,
       currency: "",
     };
   });
