@@ -549,6 +549,45 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/job-applications/statistics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    DateFrom?: string;
+                    DateTo?: string;
+                    IncludeArchived?: boolean;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GetJobApplicationStatisticsResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/job-applications/{id}/unarchive": {
         parameters: {
             query?: never;
@@ -808,6 +847,17 @@ export interface components {
             workTypes: components["schemas"]["GetJobApplicationDropdownOption"][];
             salaryTypes: components["schemas"]["GetJobApplicationDropdownOption"][];
             jobApplicationStatuses: components["schemas"]["GetJobApplicationDropdownOption"][];
+        };
+        GetJobApplicationStatisticsResponse: {
+            /** Format: int32 */
+            total: number | string;
+            statusCounts: components["schemas"]["GetJobApplicationStatisticsStatusCountDto"][];
+        };
+        GetJobApplicationStatisticsStatusCountDto: {
+            /** Format: int32 */
+            status: number | string;
+            /** Format: int32 */
+            count: number | string;
         };
         GetNoteByIdDto: {
             /** Format: uuid */

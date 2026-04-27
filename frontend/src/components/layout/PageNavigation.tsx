@@ -6,6 +6,7 @@ const navItems = [
   { path: Routes.HOME, label: "Home" },
   { path: Routes.JOB_APPLICATIONS, label: "Applications" },
   { path: Routes.ARCHIVE, label: "Archive" },
+  { path: Routes.STATISTICS, label: "Statistics" },
   { path: Routes.NOTES, label: "Notes" },
 ];
 

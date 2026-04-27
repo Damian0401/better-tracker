@@ -5,6 +5,7 @@ export const Routes = {
   NOTES: "/notes",
   JOB_APPLICATIONS: "/job-applications",
   ARCHIVE: "/archive",
+  STATISTICS: "/statistics",
 } as const;
 
 export type RoutePath = (typeof Routes)[keyof typeof Routes];

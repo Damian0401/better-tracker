@@ -4,7 +4,7 @@ export function HomePage() {
       <div className="text-center">
         <h1 className="text-4xl font-bold">BetterTracker</h1>
         <p className="mt-4 text-muted-foreground">
-          Welcome to BetterTracker - Your personal tracking application
+          Your job applications, organized.
         </p>
       </div>
     </div>
