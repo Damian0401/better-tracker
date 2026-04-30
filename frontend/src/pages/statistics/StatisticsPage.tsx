@@ -2,13 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { FormField } from "@/components/FormField";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Api } from "@/libs/api";
 import type { components } from "@/libs/api.schema.g";
 import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
-import { cn } from "@/libs/utils";
 
 type DropdownsResponse = components["schemas"]["GetJobApplicationDropdownsResponse"];
 type StatisticsResponse = components["schemas"]["GetJobApplicationStatisticsResponse"];
@@ -192,45 +192,28 @@ export function StatisticsPage() {
               />
             </FormField>
             <div className="flex items-end gap-4">
-              <button
-                type="button"
-                onClick={() =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    includeArchived: !prev.includeArchived,
-                  }))
-                }
-                className={cn(
-                  "flex h-9 items-center gap-3 rounded-md border px-3 text-sm transition-colors",
-                  "hover:bg-accent hover:text-accent-foreground",
-                  "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-                  "data-[state=on]:bg-accent data-[state=on]:text-accent-foreground",
-                  "data-[state=off]:bg-background data-[state=off]:text-foreground",
-                  filters.includeArchived ? "bg-accent text-accent-foreground" : "bg-background text-foreground",
-                )}
-                data-state={filters.includeArchived ? "on" : "off"}
-              >
-                <span
-                  className={cn(
-                    "flex h-4 w-7 items-center rounded-full bg-input px-0.5 transition-colors",
-                    "motion-safe:transition-colors",
-                    "peer-data-[state=on]:justify-end peer-data-[state=on]:bg-primary",
-                    "peer-data-[state=off]:justify-start peer-data-[state=off]:bg-muted-foreground/30",
-                  )}
+              <div className="flex h-9 items-center gap-2 rounded-md border border-input px-3">
+                <Checkbox
+                  id="include-archived"
+                  className="h-4 w-4 border-primary"
+                  checked={filters.includeArchived}
+                  onCheckedChange={(checked) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      includeArchived: checked === true,
+                    }))
+                  }
+                />
+                <label
+                  htmlFor="include-archived"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
-                  <span
-                    className={cn(
-                      "size-3 rounded-full bg-background transition-transform motion-safe:transition-transform",
-                      "motion-safe:duration-150",
-                    )}
-                  />
-                </span>
-                <span className="font-medium">Include archived</span>
-              </button>
+                  Include archived
+                </label>
+              </div>
               <Button
-                variant="ghost"
+                variant="default"
                 onClick={() => setFilters(DEFAULT_FILTERS)}
-                className="text-foreground/60 hover:text-foreground"
               >
                 Reset
               </Button>
