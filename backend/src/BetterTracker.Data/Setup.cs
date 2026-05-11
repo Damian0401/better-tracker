@@ -13,7 +13,7 @@ public static class Setup
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 
         builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlite(connectionString, 
+            options.UseNpgsql(connectionString,
                 b => b.MigrationsAssembly("BetterTracker.Data.Migrations")));
 
         return builder;

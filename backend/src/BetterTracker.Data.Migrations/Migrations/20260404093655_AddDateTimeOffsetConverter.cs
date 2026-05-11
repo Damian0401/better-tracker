@@ -11,6 +11,14 @@ namespace BetterTracker.Data.Migrations.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            if (this.ActiveProvider == "Npgsql.EntityFrameworkCore.PostgreSQL")
+            {
+                migrationBuilder.Sql(
+                    "ALTER TABLE \"Default\".\"Notes\" ALTER COLUMN \"UpdatedAt\" TYPE bigint USING \"UpdatedAt\"::bigint;" +
+                    "ALTER TABLE \"Default\".\"Notes\" ALTER COLUMN \"CreatedAt\" TYPE bigint USING \"CreatedAt\"::bigint;");
+                return;
+            }
+
             migrationBuilder.AlterColumn<long>(
                 name: "UpdatedAt",
                 schema: "Default",
@@ -33,6 +41,14 @@ namespace BetterTracker.Data.Migrations.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            if (this.ActiveProvider == "Npgsql.EntityFrameworkCore.PostgreSQL")
+            {
+                migrationBuilder.Sql(
+                    "ALTER TABLE \"Default\".\"Notes\" ALTER COLUMN \"UpdatedAt\" TYPE text USING \"UpdatedAt\"::text;" +
+                    "ALTER TABLE \"Default\".\"Notes\" ALTER COLUMN \"CreatedAt\" TYPE text USING \"CreatedAt\"::text;");
+                return;
+            }
+
             migrationBuilder.AlterColumn<DateTimeOffset>(
                 name: "UpdatedAt",
                 schema: "Default",
